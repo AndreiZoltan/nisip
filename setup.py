@@ -5,7 +5,6 @@ from setuptools import setup, find_packages
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
-README = read('README.md')
 setup(
     name='nisip',
     version='0.0.1',
@@ -13,7 +12,7 @@ setup(
     author='Andrei Zoltan',
     license='GPLv2',
     packages=find_packages(exclude=['tests', 'docs']),
-    long_description=README,
     description='A Python package for sandpile models.',
+    long_description_content_type="text/markdown",
     long_description=read('README.md'),
 )
