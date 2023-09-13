@@ -7,7 +7,7 @@ def read(fname):
 
 setup(
     name='nisip',
-    version='0.0.1',
+    version='0.0.2',
     url='https://github.com/AndreiZoltan/sandpile',
     author='Andrei Zoltan',
     license='GPLv2',
