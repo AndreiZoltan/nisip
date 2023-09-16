@@ -25,4 +25,18 @@ def drop_sand(sandpile: BaseSandpile, x: int, y: int, z: int) -> BaseSandpile:
                 sandpile.add(x - 1, y, grains)
                 sandpile.add(x, y + 1, grains)
                 sandpile.add(x, y - 1, grains)
+    elif sandpile.tiling == 'triangular':
+        while np.max(sandpile.graph) >= 6:
+            indexes = np.argwhere(sandpile.graph > 5)
+            # TODO delete invalid indexes
+            for x, y in indexes:
+                grains = sandpile.get(x, y)
+                sandpile.set(x, y, grains % 6)
+                grains = grains // 6
+                sandpile.add(x + 1, y, grains)
+                sandpile.add(x - 1, y, grains)
+                sandpile.add(x, y + 1, grains)
+                sandpile.add(x, y - 1, grains)
+                sandpile.add(x - 1, y - 1, grains)
+                sandpile.add(x + 1, y + 1, grains)
     return sandpile

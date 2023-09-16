@@ -15,4 +15,5 @@ setup(
     description='A Python package for sandpile models.',
     long_description_content_type="text/markdown",
     long_description=read('README.md'),
+    classifiers=[]
 )
