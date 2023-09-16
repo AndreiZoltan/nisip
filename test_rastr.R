@@ -28,10 +28,10 @@ SOM_Rows <- dim(heatmap_matrix)[1]
 SOM_Columns <- dim(heatmap_matrix)[2]
 
 # Set the output file path
-output_path <- "heatmap.png"
+output_path <- "heatmap100.png"
 
 # Open a PNG graphics device
-png(output_path, width = 800, height = 800, res = 300) # Adjust width, height, and resolution as needed
+png(output_path, width = 800, height = 800, res = 100) # Adjust width, height, and resolution as needed
 
 par(mar = c(0.4, 2, 2, 7))
 
