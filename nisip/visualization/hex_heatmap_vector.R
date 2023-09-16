@@ -27,11 +27,9 @@ x <- as.vector(heatmap_matrix)
 SOM_Rows <- dim(heatmap_matrix)[1]
 SOM_Columns <- dim(heatmap_matrix)[2]
 
-# Set the output file path
-output_path <- "heatmap100.png"
+output_path <- "heatmap_R.svg"
 
-# Open a PNG graphics device
-png(output_path, width = 800, height = 800, res = 100) # Adjust width, height, and resolution as needed
+svg(output_path, width = 8, height = 8, pointsize = 12) # Adjust width, height, and pointsize as needed
 
 par(mar = c(0.4, 2, 2, 7))
 
@@ -45,7 +43,7 @@ color_code <- rep("#FFFFFF", length(x)) #default is all white
 
 bins <- seq(min(x, na.rm = TRUE), max(x, na.rm = TRUE),
             length = length(col_ramp))
-for (i in 1:length(x)){
+for (i in seq_along(x)){
   if (!is.na(x[i])) color_code[i] <- col_ramp[which.min(abs(bins - x[i]))]
 }
 
@@ -57,10 +55,4 @@ for (row in 1:SOM_Rows) {
   offset <- ifelse(offset, 0, 0.5)
 }
 
-# Close the PNG graphics device
 dev.off()
-
-# Display the saved plot
-img <- readPNG(output_path)
-plot(0:1, 0:1, type = "n", axes = FALSE, xlab = "", ylab = "")
-rasterImage(img, 0, 0, 1, 1)

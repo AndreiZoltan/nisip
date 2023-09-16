@@ -24,20 +24,18 @@ hexagon <- function(x, y, unitcell = 1, col = col) {
 
 x <- as.vector(heatmap_matrix)
 
-SOM_Rows <- dim(heatmap_matrix)[1]
-SOM_Columns <- dim(heatmap_matrix)[2]
+width <- dim(heatmap_matrix)[1]
+height <- dim(heatmap_matrix)[2]
 
-# Set the output file path
-output_path <- "heatmap.svg"
+output_path <- "heatmap_R.png"
 
-# Open an SVG graphics device
-svg(output_path, width = 8, height = 8, pointsize = 12) # Adjust width, height, and pointsize as needed
+png(output_path, width = width * 100, height = height * 100, res = 100)
 
 par(mar = c(0.4, 2, 2, 7))
 
 plot(0, 0, type = "n", axes = FALSE,
-     xlim = c(0, SOM_Columns),
-     ylim = c(0, SOM_Rows),
+     xlim = c(0, height),
+     ylim = c(0, width),
      xlab = "", ylab = "", asp = 1)
 
 col_ramp <- rev(viridis(50, option = "magma"))
@@ -45,20 +43,16 @@ color_code <- rep("#FFFFFF", length(x)) #default is all white
 
 bins <- seq(min(x, na.rm = TRUE), max(x, na.rm = TRUE),
             length = length(col_ramp))
-for (i in 1:length(x)){
+for (i in seq_along(x)){
   if (!is.na(x[i])) color_code[i] <- col_ramp[which.min(abs(bins - x[i]))]
 }
 
 offset <- 0.5
-for (row in 1:SOM_Rows) {
-  for (column in 0:(SOM_Columns - 1)){
-    hexagon(column + offset, row - 1, col = color_code[row + SOM_Rows * column])
+for (row in 1:width) {
+  for (column in 0:(height - 1)){
+    hexagon(column + offset, row - 1, col = color_code[row + width * column])
   }
   offset <- ifelse(offset, 0, 0.5)
 }
 
-# Close the SVG graphics device
 dev.off()
-
-# Display the saved vector image
-# browseURL(output_path)

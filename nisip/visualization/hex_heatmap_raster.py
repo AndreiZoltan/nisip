@@ -5,7 +5,6 @@ import matplotlib.colors as mcolors
 import matplotlib.cm as cm
 import pickle
 
-# Load your heatmap data
 heatmap_matrix = pickle.load(open("./random.pkl", "rb"))
 
 def hexagon(x, y, unitcell=1, col="white"):
@@ -19,38 +18,32 @@ def hexagon(x, y, unitcell=1, col="white"):
         (x + unitcell/2, y + h),
         (x, y + h/2)
     ]
-    hexagon = Polygon(hex_coords, closed=True, edgecolor='none', facecolor=col)
+    hexagon = Polygon(hex_coords, closed=True, edgecolor='none', facecolor=col) # type: ignore
     plt.gca().add_patch(hexagon)
 
-heatmap_data = np.array(heatmap_matrix).flatten()
+heatmap_data = np.array(heatmap_matrix)
 
 SOM_Rows = heatmap_matrix.shape[0]
 SOM_Columns = heatmap_matrix.shape[1]
 
-# Set the output file path
-output_path = "heatmap100_py.png"
+output_path = "heatmap_py.png"
 
-# Create a figure and axis for the plot
 plt.figure(figsize=(8, 8))
 plt.xlim(0, SOM_Columns)
 plt.ylim(0, SOM_Rows)
-plt.axis('off')  # Turn off axis labels and ticks
+plt.axis('off')
 
-# Create a colormap similar to viridis
 col_ramp = cm.get_cmap('magma', 50)(np.linspace(0, 1, 50))
-
-# Create color mapping based on data values
-bins = np.linspace(np.nanmin(heatmap_data), np.nanmax(heatmap_data), num=len(col_ramp))
-color_code = [col_ramp[np.argmin(np.abs(bins - value))] if not np.isnan(value) else 'white' for value in heatmap_data]
+norm = plt.Normalize(vmin=np.nanmin(heatmap_data), vmax=np.nanmax(heatmap_data)) # type: ignore
+color_mapper = cm.ScalarMappable(norm=norm, cmap='Oranges')
 
 offset = 0.5
 for row in range(SOM_Rows):
     for column in range(SOM_Columns):
-        hexagon(column + offset, row - 1, col=color_code[row + SOM_Rows * column])
+        value = heatmap_data[row, column]
+        if not np.isnan(value):
+            color = color_mapper.to_rgba(value)
+            hexagon(column + offset, row - 1, col=color) # type: ignore
     offset = 0 if offset else 0.5
 
-# Save the plot as a PNG file
-plt.savefig(output_path, dpi=100, bbox_inches='tight', pad_inches=0)
-
-# Display the saved plot (optional)
-# plt.show()
+plt.savefig(output_path, dpi=300, bbox_inches='tight', pad_inches=0)
