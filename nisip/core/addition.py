@@ -2,6 +2,7 @@
 In this file we will define a class of sandpile for trianglular lattices.
 
 """
+from copy import deepcopy
 
 import numpy as np
 
@@ -11,6 +12,8 @@ def drop_sand(sandpile: BaseSandpile, x: int, y: int, z: int) -> BaseSandpile:
     """
     Add z grains of sand to the pile at (x, y).
     """
+    sandpile = deepcopy(sandpile)
+    sandpile.add_history(x, y, z)
     sandpile.add(x, y, z)
     if sandpile.tiling == 'square':
         while np.max(sandpile.graph) >= 4:

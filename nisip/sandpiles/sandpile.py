@@ -7,8 +7,8 @@ class Sandpile(BaseSandpile):
     """
     A class of sandpile for triangular lattices.
     """
-    def __init__(self, size: int, tiling: str = 'square') -> None:
-        super().__init__(size, tiling)
+    def __init__(self, width: int, height: int, tiling: str = 'square') -> None:
+        super().__init__(width, height, tiling)
 
     def drop_sand(self, x: int, y: int, z: int) -> BaseSandpile:
-        return drop_sand(deepcopy(self), x, y, z)
+        return drop_sand(self, x, y, z)
