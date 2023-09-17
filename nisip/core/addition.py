@@ -6,9 +6,9 @@ from copy import deepcopy
 
 import numpy as np
 
-from nisip.sandpiles.basesandpile import BaseSandpile
+from nisip.sandpiles.sandpile import Sandpile
 # drop_sand
-def drop_sand(sandpile: BaseSandpile, x: int, y: int, z: int) -> BaseSandpile:
+def drop_sand(sandpile: Sandpile, x: int, y: int, z: int) -> Sandpile:
     """
     Add z grains of sand to the pile at (x, y).
     """
