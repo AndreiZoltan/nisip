@@ -38,7 +38,7 @@ def hexagon(x: float, y: float, color: list, unitcell=1):
 def matrix2color(matrix: npt.NDArray, colormap: str = "viridis") -> npt.NDArray:
     col_ramp = cm.get_cmap("viridis")
     matrix = (matrix - np.min(matrix)) / (np.max(matrix) - np.min(matrix))
-    return col_ramp(matrix) # type: ignore
+    return col_ramp(matrix)  # type: ignore
 
 
 def hex_heatmap_vec(graph_path: str, output_path: str, ncolors=6) -> None:
