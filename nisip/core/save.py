@@ -2,11 +2,11 @@ import sqlite3
 import datetime
 import json
 import os
+import subprocess
 from pathlib import Path
 
 nisip_path = Path(__file__).parent.parent.parent
 
-import pickle
 import numpy as np
 
 from nisip import Sandpile
@@ -64,6 +64,8 @@ def save(sandpile: Sandpile) -> None:
     hex_heatmap_vec(
         graph_path, f"{dunes_path}/{folder}/graph.svg", ncolors(sandpile.tiling)
     )
+    # subprocess.run(["Rscript", f"{nisip_path}/nisip/visualization/hex_heatmap_raster.R",
+    #                 graph_path, f"{dunes_path}/{folder}/graph.png"])
     # save history as csv
     np.savetxt(f"{dunes_path}/{folder}/history.csv", sandpile.history, delimiter=",")
     with open(f"{dunes_path}/{folder}/meta.json", "w") as f:

@@ -3,7 +3,6 @@ library(viridisLite)
 library(viridis)
 library(reticulate)
 library(RColorBrewer)
-use_python("/home/zoltan/miniconda3/envs/nis/bin/python")
 heatmap_matrix <- py_load_object("./random.pkl")
 
 hexagon <- function(x, y, unitcell = 1, col = col) {

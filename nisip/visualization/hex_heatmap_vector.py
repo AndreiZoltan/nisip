@@ -34,26 +34,28 @@ def hexagon(x, y, color, unitcell=1):
     plt.gca().add_patch(hexagon_)
 
 
+def matrix2color(matrix: np.array, colormap: str = "viridis") -> np.array:
+    col_ramp = cm.get_cmap("viridis")
+    matrix = (matrix - np.min(matrix)) / (np.max(matrix) - np.min(matrix))
+    return col_ramp(matrix)
+
+
 def hex_heatmap_vec(graph_path, output_path, ncolors=6) -> None:
     heatmap = np.loadtxt(graph_path, delimiter=",", dtype=int)
 
-    width, height = heatmap.shape
+    height, width = heatmap.shape
 
-    plt.figure(figsize=(8, 8))
+    plt.figure(figsize=(20, 20))
     plt.xlim(0, height)
     plt.ylim(0, width)
     plt.axis("off")
 
-    col_ramp = cm.get_cmap("viridis")
-    grad = np.linspace(0.2, 1, ncolors)
+    heatmap = matrix2color(heatmap)
     # offset = 0.5*height
     offset = 0
     for row in range(width):
         for column in range(height):
-            # print("---------------------")
-            # print(col_ramp(grad))
-            # print(heatmap[row, column])
-            hexagon(column + offset, row, col_ramp(grad[heatmap[row, column]]))
+            hexagon(column + offset, row, heatmap[row, column])
         # offset -= 0.5
         offset += 0.5
 
