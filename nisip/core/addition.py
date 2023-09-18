@@ -7,7 +7,8 @@ from copy import deepcopy
 import numpy as np
 
 from nisip.sandpiles.sandpile import Sandpile
-# drop_sand
+
+
 def drop_sand(sandpile: Sandpile, x: int, y: int, z: int) -> Sandpile:
     """
     Add z grains of sand to the pile at (x, y).
@@ -17,7 +18,6 @@ def drop_sand(sandpile: Sandpile, x: int, y: int, z: int) -> Sandpile:
     sandpile.add(x, y, z)
     if sandpile.tiling == 'square':
         while np.max(sandpile.graph) >= 4:
-            # print(np.max(sandpile.graph), "max")
             indexes = np.argwhere(sandpile.graph > 3)
             # TODO delete invalid indexes
             for x, y in indexes:

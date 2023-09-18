@@ -1,11 +1,12 @@
 import random
+import json
 
 import numpy as np
 import networkx as nx
 
 
 class BaseSandpile:
-    def __init__(self, width, height, tiling= 'square') -> None:
+    def __init__(self, width, height, tiling='square') -> None:
         if tiling not in ['triangular', 'square', 'hexagonal']:
             raise ValueError("Tiling must be either 'triangle',\
                              'square' or 'hexagonal'.")
@@ -49,7 +50,7 @@ class BaseSandpile:
         """
         Add a step to the history of the sandpile.
         """
-        self.history = np.append(self.history, [[x, y, z]], axis=0)
+        self.history = np.append(self.history, np.array([[x, y, z]]), axis=0)
     
     @property
     def grains(self) -> int:
@@ -57,3 +58,21 @@ class BaseSandpile:
         Return the total number of grains in the sandpile.
         """
         return int(np.sum(self.graph))
+    
+    @property
+    def meta(self):
+        """
+        Return the metadata of the sandpile.
+        """
+        return {
+            'id': self.id,
+            'width': self.width,
+            'height': self.height,
+            'tiling': self.tiling,
+            'is_directed': self.is_directed,
+            'grains': self.grains,
+            'history': self.history.tolist()
+        }
+
+    def get_graph(self):
+        return self.graph.astype(np.int64)

@@ -1,5 +1,6 @@
 import sqlite3
 import datetime
+import json
 import os
 from pathlib import Path
 nisip_path = Path(__file__).parent.parent.parent
@@ -15,6 +16,21 @@ def check_integrity() -> None:
     Check if the database is consistent with the files in nisip_path/dunes.
     """
     pass
+
+
+def ncolors(tiling: str) -> int:
+    """
+    Return the number of colors for a given tiling.
+    """
+    if tiling == "square":
+        return 4
+    elif tiling == "triangular":
+        return 6
+    elif tiling == "hexagonal":
+        return 3
+    else:
+        raise ValueError(f"Invalid tiling: {tiling}")
+
 
 def save(sandpile: Sandpile) -> None:
     """
@@ -33,14 +49,18 @@ def save(sandpile: Sandpile) -> None:
                     is_directed BOOLEAN)")
     check_integrity()
     current_time = datetime.datetime.now()
+    # create folder
     folder = current_time.strftime("%Y_%m_%d_%H_%M_%S")
     os.makedirs(f"{dunes_path}/{folder}", exist_ok=False)
+    # save graph matrix
     graph_path = f"{dunes_path}/{folder}/graph.csv"
-    np.savetxt(graph_path, sandpile.graph, delimiter=",")
-    hex_heatmap_vec(graph_path, f"{dunes_path}/{folder}/graph.svg")
+    np.savetxt(graph_path, sandpile.get_graph(), delimiter=",", fmt='%i')
+    # save image
+    hex_heatmap_vec(graph_path, f"{dunes_path}/{folder}/graph.svg", ncolors(sandpile.tiling))
     # save history as csv
-    history_path = f"{dunes_path}/{folder}/history.csv"
-    np.savetxt(history_path, sandpile.history, delimiter=",")
+    np.savetxt(f"{dunes_path}/{folder}/history.csv", sandpile.history, delimiter=",")
+    with open(f"{dunes_path}/{folder}/meta.json", "w") as f:
+        json.dump(sandpile.meta, f)
     cur.execute("""INSERT INTO dunes (folder, grains, width, height, tiling, is_directed)
                VALUES (?, ?, ?, ?, ?, ?)""",
               (folder, sandpile.grains, sandpile.width, sandpile.height,
