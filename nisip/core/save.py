@@ -11,6 +11,7 @@ import numpy as np
 
 from nisip import Sandpile
 from nisip.visualization.hex_heatmap_vector import hex_heatmap_vec
+from nisip.visualization.hex_heatmap_raster import hex_heatmap_raster
 
 
 def check_integrity() -> None:
@@ -61,9 +62,12 @@ def save(sandpile: Sandpile) -> None:
     np.savetxt(graph_path, sandpile.get_graph(), delimiter=",", fmt="%i")
     # save image
     assert ncolors(sandpile.tiling) == 6
-    hex_heatmap_vec(
-        graph_path, f"{dunes_path}/{folder}/graph.svg", ncolors(sandpile.tiling)
+    hex_heatmap_raster(
+        graph_path, f"{dunes_path}/{folder}/graph.png", ncolors(sandpile.tiling)
     )
+    # hex_heatmap_vec(
+    #     graph_path, f"{dunes_path}/{folder}/graph.svg", ncolors(sandpile.tiling)
+    # )
     # subprocess.run(["Rscript", f"{nisip_path}/nisip/visualization/hex_heatmap_raster.R",
     #                 graph_path, f"{dunes_path}/{folder}/graph.png"])
     # save history as csv
