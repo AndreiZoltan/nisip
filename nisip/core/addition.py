@@ -16,6 +16,7 @@ def drop_sand(sandpile: Sandpile, x: int, y: int, z: int) -> Sandpile:
     sandpile = deepcopy(sandpile)
     sandpile.add_history(x, y, z)
     sandpile.add(x, y, z)
+    assert sandpile.tiling in ["triangular"]
     if sandpile.tiling == "square":
         while np.max(sandpile.graph) >= 4:
             indexes = np.argwhere(sandpile.graph > 3)

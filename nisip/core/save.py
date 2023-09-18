@@ -55,10 +55,13 @@ def save(sandpile: Sandpile) -> None:
     check_integrity()
     current_time = datetime.datetime.now()
     # create folder
-    folder = current_time.strftime("%Y_%m_%d_%H_%M_%S")
-    os.makedirs(f"{dunes_path}/{folder}", exist_ok=False)
+    # folder = current_time.strftime("%Y_%m_%d_%H_%M_%S")
+    folder = "tests"
+    # os.makedirs(f"{dunes_path}/{folder}", exist_ok=False)
+    os.makedirs(f"{dunes_path}/{folder}", exist_ok=True)
     # save graph matrix
-    graph_path = f"{dunes_path}/{folder}/graph.csv"
+    current = current_time.strftime("%Y_%m_%d_%H_%M_%S")
+    graph_path = f"{dunes_path}/{folder}/graph_{current}.csv"
     np.savetxt(graph_path, sandpile.get_graph(), delimiter=",", fmt="%i")
     # save image
     assert ncolors(sandpile.tiling) == 6
@@ -71,8 +74,13 @@ def save(sandpile: Sandpile) -> None:
     # subprocess.run(["Rscript", f"{nisip_path}/nisip/visualization/hex_heatmap_raster.R",
     #                 graph_path, f"{dunes_path}/{folder}/graph.png"])
     # save history as csv
-    np.savetxt(f"{dunes_path}/{folder}/history.csv", sandpile.history, delimiter=",")
-    with open(f"{dunes_path}/{folder}/meta.json", "w") as f:
+    np.savetxt(
+        f"{dunes_path}/{folder}/history_{current}.csv",
+        sandpile.history,
+        delimiter=",",
+        fmt="%i",
+    )
+    with open(f"{dunes_path}/{folder}/meta_{current}.json", "w") as f:
         json.dump(sandpile.meta, f)
     cur.execute(
         """INSERT INTO dunes (folder, grains, width, height, tiling, is_directed)

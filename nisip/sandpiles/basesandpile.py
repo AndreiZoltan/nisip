@@ -36,7 +36,8 @@ class BaseSandpile:
         """
         Add z grains of sand to the pile at (x, y).
         """
-        self.graph[x, y] += z
+        if 0 < x < self.width - 1 and 0 < y < self.height - 1:
+            self.graph[x, y] += z
 
     def get(self, x: int, y: int) -> int:
         """
@@ -48,7 +49,8 @@ class BaseSandpile:
         """
         Set the number of grains at (x, y) to z.
         """
-        self.graph[x, y] = z
+        if 0 < x or x < self.width - 1 or 0 < y or y < self.height - 1:
+            self.graph[x, y] = z
 
     def add_history(self, x: int, y: int, z: int) -> None:
         """

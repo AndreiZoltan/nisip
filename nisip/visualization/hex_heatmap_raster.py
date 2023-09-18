@@ -22,8 +22,10 @@ def hexagon(x, y, unitcell=1, col="white"):
 
 
 def matrix2color(matrix: np.array, colormap: str = "viridis") -> np.array:
-    col_ramp = cm.get_cmap("viridis")
-    matrix = (matrix - np.min(matrix)) / (np.max(matrix) - np.min(matrix))
+    # col_ramp = cm.get_cmap("viridis")
+    col_ramp = cm.get_cmap("Paired")
+    matrix = (matrix + 1) / 7
+    # matrix = matrix / 6
     return col_ramp(matrix)
 
 
