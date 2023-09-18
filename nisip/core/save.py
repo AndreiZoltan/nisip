@@ -3,6 +3,7 @@ import datetime
 import json
 import os
 from pathlib import Path
+
 nisip_path = Path(__file__).parent.parent.parent
 
 import pickle
@@ -10,6 +11,7 @@ import numpy as np
 
 from nisip import Sandpile
 from nisip.visualization.hex_heatmap_vector import hex_heatmap_vec
+
 
 def check_integrity() -> None:
     """
@@ -44,9 +46,11 @@ def save(sandpile: Sandpile) -> None:
     cur = con.cursor()
     res = cur.execute("SELECT name FROM sqlite_master")
     if not res.fetchall():
-        cur.execute("CREATE TABLE dunes (id INTEGER PRIMARY KEY,\
+        cur.execute(
+            "CREATE TABLE dunes (id INTEGER PRIMARY KEY,\
                     folder TEXT, grains INTEGER, width INTEGER, height INTEGER, tiling TEXT,\
-                    is_directed BOOLEAN)")
+                    is_directed BOOLEAN)"
+        )
     check_integrity()
     current_time = datetime.datetime.now()
     # create folder
@@ -54,28 +58,30 @@ def save(sandpile: Sandpile) -> None:
     os.makedirs(f"{dunes_path}/{folder}", exist_ok=False)
     # save graph matrix
     graph_path = f"{dunes_path}/{folder}/graph.csv"
-    np.savetxt(graph_path, sandpile.get_graph(), delimiter=",", fmt='%i')
+    np.savetxt(graph_path, sandpile.get_graph(), delimiter=",", fmt="%i")
     # save image
-    hex_heatmap_vec(graph_path, f"{dunes_path}/{folder}/graph.svg", ncolors(sandpile.tiling))
+    assert ncolors(sandpile.tiling) == 6
+    hex_heatmap_vec(
+        graph_path, f"{dunes_path}/{folder}/graph.svg", ncolors(sandpile.tiling)
+    )
     # save history as csv
     np.savetxt(f"{dunes_path}/{folder}/history.csv", sandpile.history, delimiter=",")
     with open(f"{dunes_path}/{folder}/meta.json", "w") as f:
         json.dump(sandpile.meta, f)
-    cur.execute("""INSERT INTO dunes (folder, grains, width, height, tiling, is_directed)
+    cur.execute(
+        """INSERT INTO dunes (folder, grains, width, height, tiling, is_directed)
                VALUES (?, ?, ?, ?, ?, ?)""",
-              (folder, sandpile.grains, sandpile.width, sandpile.height,
-               sandpile.tiling, sandpile.is_directed))
+        (
+            folder,
+            sandpile.grains,
+            sandpile.width,
+            sandpile.height,
+            sandpile.tiling,
+            sandpile.is_directed,
+        ),
+    )
 
     con.commit()
-
-
-    
-
-
-
-
-
-
 
     # print("The image and history were saved in the directory nisip/dunes.")
     # TODO database of experiments

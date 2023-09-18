@@ -16,7 +16,7 @@ def drop_sand(sandpile: Sandpile, x: int, y: int, z: int) -> Sandpile:
     sandpile = deepcopy(sandpile)
     sandpile.add_history(x, y, z)
     sandpile.add(x, y, z)
-    if sandpile.tiling == 'square':
+    if sandpile.tiling == "square":
         while np.max(sandpile.graph) >= 4:
             indexes = np.argwhere(sandpile.graph > 3)
             # TODO delete invalid indexes
@@ -28,7 +28,7 @@ def drop_sand(sandpile: Sandpile, x: int, y: int, z: int) -> Sandpile:
                 sandpile.add(x - 1, y, grains)
                 sandpile.add(x, y + 1, grains)
                 sandpile.add(x, y - 1, grains)
-    elif sandpile.tiling == 'triangular':
+    elif sandpile.tiling == "triangular":
         while np.max(sandpile.graph) >= 6:
             indexes = np.argwhere(sandpile.graph > 5)
             # TODO delete invalid indexes
