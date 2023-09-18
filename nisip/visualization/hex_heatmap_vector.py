@@ -1,13 +1,14 @@
 from argparse import ArgumentParser
 
 import numpy as np
+import numpy.typing as npt
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
 import matplotlib.colors as mcolors
 import matplotlib.cm as cm
 
 
-def build_argparser():
+def build_argparser() -> ArgumentParser:
     parser = ArgumentParser()
     parser.prog = "hex heatmap vector (slow)"
     parser.add_argument(
@@ -19,7 +20,7 @@ def build_argparser():
     return parser
 
 
-def hexagon(x, y, color, unitcell=1):
+def hexagon(x: float, y: float, color: list, unitcell=1):
     """Draw a hexagon at coordinates (x, y) with the given color."""
     h = np.sqrt(3) / 2 * unitcell
     hex_coords = [
@@ -34,13 +35,13 @@ def hexagon(x, y, color, unitcell=1):
     plt.gca().add_patch(hexagon_)
 
 
-def matrix2color(matrix: np.array, colormap: str = "viridis") -> np.array:
+def matrix2color(matrix: npt.NDArray, colormap: str = "viridis") -> npt.NDArray:
     col_ramp = cm.get_cmap("viridis")
     matrix = (matrix - np.min(matrix)) / (np.max(matrix) - np.min(matrix))
-    return col_ramp(matrix)
+    return col_ramp(matrix) # type: ignore
 
 
-def hex_heatmap_vec(graph_path, output_path, ncolors=6) -> None:
+def hex_heatmap_vec(graph_path: str, output_path: str, ncolors=6) -> None:
     heatmap = np.loadtxt(graph_path, delimiter=",", dtype=int)
 
     height, width = heatmap.shape

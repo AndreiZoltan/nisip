@@ -1,4 +1,4 @@
-from nisip.sandpiles.basesandpile import BaseSandpile
+from .basesandpile import BaseSandpile
 
 
 class Sandpile(BaseSandpile):
