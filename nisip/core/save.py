@@ -35,7 +35,7 @@ def ncolors(tiling: str) -> int:
         raise ValueError(f"Invalid tiling: {tiling}")
 
 
-def save(sandpile: Sandpile) -> None:
+def save(sandpile: Sandpile, imsave=True) -> None:
     """
     Write a sandpile to a png file.
     """
@@ -65,9 +65,10 @@ def save(sandpile: Sandpile) -> None:
     np.savetxt(graph_path, sandpile.get_graph(), delimiter=",", fmt="%i")
     # save image
     assert ncolors(sandpile.tiling) == 6
-    hex_heatmap_raster(
-        graph_path, f"{dunes_path}/{folder}/graph.png", ncolors(sandpile.tiling)
-    )
+    if imsave:
+        hex_heatmap_raster(
+            graph_path, f"{dunes_path}/{folder}/graph.png", ncolors(sandpile.tiling)
+        )
     # hex_heatmap_vec(
     #     graph_path, f"{dunes_path}/{folder}/graph.svg", ncolors(sandpile.tiling)
     # )

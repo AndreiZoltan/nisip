@@ -14,13 +14,8 @@ sys.path.append(r"{}/{}".format(parent_dir, "nisip"))
 
 
 test_path = Path(__file__).parent
-# sys.path.append('***REMOVED***')
-# sys.path.append('***REMOVED***/tests')
-# sys.path.append('***REMOVED***/nisip')
-# sys.path.append('***REMOVED***/nisip/sandpiles')
-# from nisip import Sandpile, drop_sand
 from sandpiles import Sandpile  # type: ignore
-from core import drop_sand  # type: ignore
+from core import drop_sand, drop_sand_cache  # type: ignore
 
 # from nisip import save
 files = os.listdir(f"{test_path}/true_data")
@@ -44,14 +39,32 @@ def create_from_meta(meta: dict) -> Sandpile:
     return sandpile
 
 
+def create_from_meta_cache(meta: dict) -> Sandpile:
+    """
+    Create a sandpile from a metadata dictionary.
+    """
+    sandpile = Sandpile(int(meta["width"]), int(meta["height"]), meta["tiling"])
+    for x, y, z in np.array(meta["history"], dtype=np.int64):
+        sandpile = drop_sand_cache(sandpile, x, y, z)
+    return sandpile
+
+
+# @pytest.mark.parametrize("graph, meta", test_list)
+# def drop_sand_test(graph, meta):
+#     graph = np.loadtxt(f"{test_path}/true_data/{graph}", delimiter=",")
+#     with open(f"{test_path}/true_data/{meta}") as f:
+#         meta = json.load(f)
+#     sandpile = create_from_meta(meta)
+#     assert np.array_equal(sandpile.graph, graph)
+
+
 @pytest.mark.parametrize("graph, meta", test_list)
-def drop_sand_test(graph, meta):
+def drop_sand_cache_test(graph, meta):
     graph = np.loadtxt(f"{test_path}/true_data/{graph}", delimiter=",")
     with open(f"{test_path}/true_data/{meta}") as f:
         meta = json.load(f)
-    sandpile = create_from_meta(meta)
+    sandpile = create_from_meta_cache(meta)
     assert np.array_equal(sandpile.graph, graph)
-
 
 @pytest.mark.parametrize(
     "width, height, tiling, x, y, z",
