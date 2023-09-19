@@ -66,6 +66,7 @@ def drop_sand_cache_test(graph, meta):
     sandpile = create_from_meta_cache(meta)
     assert np.array_equal(sandpile.graph, graph)
 
+
 @pytest.mark.parametrize(
     "width, height, tiling, x, y, z",
     [

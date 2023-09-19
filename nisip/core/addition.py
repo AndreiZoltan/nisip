@@ -91,7 +91,7 @@ def drop_sand_cache(sandpile: Sandpile, x: int, y: int, z: int) -> Sandpile:
                         new_cache = np.append(new_cache, [[x - 1, y - 1]], axis=0)
                         new_cache = np.append(new_cache, [[x + 1, y + 1]], axis=0)
                 cache = new_cache
-                    
+
             indexes = np.argwhere(sandpile.graph > 5)
             # TODO delete invalid indexes
             for x, y in indexes:
