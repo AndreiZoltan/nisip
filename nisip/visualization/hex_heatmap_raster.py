@@ -6,7 +6,7 @@ import matplotlib.cm as cm
 import pickle
 
 
-def hexagon(x, y, unitcell=1, col="white"):
+def hexagon(x, y, unitcell=1, col="white", egdecolor="g"):
     """Draw a hexagon at coordinates (x, y) with the given color."""
     h = np.sqrt(3) / 2 * unitcell
     hex_coords = [
@@ -17,19 +17,17 @@ def hexagon(x, y, unitcell=1, col="white"):
         (x + unitcell / 2, y + h),
         (x, y + h / 2),
     ]
-    hexagon = Polygon(hex_coords, closed=True, edgecolor="g", facecolor=col)  # type: ignore
+    hexagon = Polygon(hex_coords, closed=True, edgecolor=egdecolor, facecolor=col)  # type: ignore
     plt.gca().add_patch(hexagon)
 
 
-def matrix2color(matrix: np.array, colormap: str = "viridis") -> np.array:
-    # col_ramp = cm.get_cmap("viridis")
+def matrix2color(matrix: np.array, colormap: str = "viridis") -> np.array:  # type: ignore
     col_ramp = cm.get_cmap("Paired")
     matrix = (matrix + 1) / 7
-    # matrix = matrix / 6
     return col_ramp(matrix)
 
 
-def hex_heatmap_raster(graph_path, output_path, ncolors=6) -> None:
+def hex_heatmap_raster(graph_path, output_path, ncolors=6, edgecolor="g") -> None:
     heatmap = np.loadtxt(graph_path, delimiter=",", dtype=int)
     height, width = heatmap.shape
 
@@ -48,7 +46,7 @@ def hex_heatmap_raster(graph_path, output_path, ncolors=6) -> None:
         for column in range(width):
             color = heatmap[row, column]
             x, y = column + offset, row
-            hexagon(x, -y, col=color)
+            hexagon(x, -y, col=color, egdecolor=edgecolor)
         offset += 0.5
 
     plt.savefig(output_path, dpi=300, bbox_inches="tight", pad_inches=0)
