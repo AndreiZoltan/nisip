@@ -35,7 +35,7 @@ def ncolors(tiling: str) -> int:
         raise ValueError(f"Invalid tiling: {tiling}")
 
 
-def save(sandpile: Sandpile, imsave=True) -> None:
+def save(sandpile: Sandpile, imsave=True, folder=None) -> None:
     """
     Write a sandpile to a png file.
     """
@@ -54,9 +54,8 @@ def save(sandpile: Sandpile, imsave=True) -> None:
         )
     check_integrity()
     current_time = datetime.datetime.now()
-    # create folder
-    # folder = current_time.strftime("%Y_%m_%d_%H_%M_%S")
-    folder = "tests"
+    if folder is None:
+        folder = current_time.strftime("%Y_%m_%d_%H_%M_%S")
     # os.makedirs(f"{dunes_path}/{folder}", exist_ok=False)
     os.makedirs(f"{dunes_path}/{folder}", exist_ok=True)
     # save graph matrix
