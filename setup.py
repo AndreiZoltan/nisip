@@ -18,10 +18,8 @@ setup(
     description="A Python package for sandpile models.",
     long_description_content_type="text/markdown",
     long_description=read("README.md"),
-    ext_modules=[Extension("caddition", sources=["cnisip/caddition.c"]),
-                 Extension("abc123", sources=["cnisip/abc123.c"],
-                           include_dirs=[np.get_include(), get_paths()["include"]]),
-                 Extension("relax", sources=["cnisip/relax.c"],
-                           include_dirs=[np.get_include(), get_paths()["include"]])],
+    ext_modules=[Extension("relax", sources=["cnisip/relax.c"],
+                           include_dirs=[np.get_include(), get_paths()["include"]],
+                           extra_compile_args = ["-O3", "-march=native"])],
     classifiers=[],
 )
