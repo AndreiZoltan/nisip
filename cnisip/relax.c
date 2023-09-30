@@ -96,22 +96,25 @@ static PyObject *square_relax(PyObject *self, PyObject *args)
         return NULL;
     }
     
-    long long **data;
+    long long **_data;
     int64_t size = PyArray_SIZE(arr);
     npy_intp *dims = PyArray_DIMS(arr);
-    PyArray_AsCArray((PyObject **)&arr, &data, dims, 2, PyArray_DescrFromType(NPY_INT64));
+    PyArray_AsCArray((PyObject **)&arr, &_data, dims, 2, PyArray_DescrFromType(NPY_INT64));
     if (PyErr_Occurred())
     {
         return NULL;
     }
     printf("dims[0] = %ld\n", dims[0]);
     printf("dims[1] = %ld\n", dims[1]);
+    long long *data;
+    data = malloc(size*sizeof(long long));
     for (int i = 0; i < (int)dims[0]; i++)
     {
         for(int j = 0; j < (int)dims[1]; j++)
         {
-            printf("%ld <------\n", i*dims[1] + j);
-            printf("%d\n", data[i][j]);
+            printf("%ld <------\n", i*dims[0] + j);
+            printf("%lld\n", _data[i][j]);
+            data[i*dims[0] + j] = _data[i][j];
         }
     }
     PyObject *result = PyArray_SimpleNew(2, dims, NPY_INT64);
@@ -120,60 +123,10 @@ static PyObject *square_relax(PyObject *self, PyObject *args)
     {
         for(int j = 0; j < (int)dims[1]; j++)
         {
-            result_data[i*dims[1] + j] = 2*data[i][j];
+            result_data[i*dims[1] + j] = 2*data[i*dims[1] + j];
         }
     }
     return result;
-};
-
-
-static PyObject *square_relax2(PyObject *self, PyObject *args)
-{
-    PyArrayObject *arr;
-    PyArg_ParseTuple(args, "O", &arr);
-    if (PyErr_Occurred())
-    {
-        return NULL;
-    }
-    if (!PyArray_Check(arr) || PyArray_TYPE(arr) != NPY_INT || !PyArray_IS_C_CONTIGUOUS(arr)){
-        PyErr_SetString(PyExc_TypeError, "Argument must be C contiguous numpy array of type int.");
-        return NULL;
-    }
-    if (!PyArray_Check(arr))
-    {
-        PyErr_SetString(PyExc_TypeError, "Argument must be numpy array.");
-        return NULL;
-    }
-    if (PyArray_TYPE(arr) != NPY_INT)
-    {
-        PyErr_SetString(PyExc_TypeError, "Argument must be numpy array of type int.");
-        return NULL;
-    }
-    if (!PyArray_IS_C_CONTIGUOUS(arr))
-    {
-        PyErr_SetString(PyExc_TypeError, "Argument must be C contiguous.");
-        return NULL;
-    }
-    if (PyErr_Occurred())
-    {
-        printf("error after **data\n");
-        return NULL;
-    }
-    int64_t size = PyArray_SIZE(arr);
-    npy_intp *dims = PyArray_DIMS(arr);
-    int *data = (int*)PyArray_DATA(arr);
-    for (int i = 0; i < (int)dims[0]; i++)
-    {
-        for(int j = 0; j < (int)dims[1]; j++)
-        {
-            printf("%ld <------\n", i*dims[0] + j);
-            printf("%d\n", data[i*dims[0] + j]);
-        }
-    }
-
-    int total = 0;
-    return PyLong_FromLong(total);
-    // return result;
 };
 
 
