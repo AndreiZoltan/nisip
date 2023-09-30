@@ -3,6 +3,9 @@
 #include <Python.h>
 #include <numpy/arrayobject.h>
 #include <stdio.h>
+#include "square_relax2.c"
+
+
 
 
 PyObject *add(PyObject *self, PyObject *args)
@@ -112,18 +115,19 @@ static PyObject *square_relax(PyObject *self, PyObject *args)
     {
         for(int j = 0; j < (int)dims[1]; j++)
         {
-            printf("%ld <------\n", i*dims[0] + j);
-            printf("%lld\n", _data[i][j]);
             data[i*dims[0] + j] = _data[i][j];
         }
     }
+    printf("BEFORE\n");
+    square_relax_simple(data, (int)dims[0], (int)dims[1]);
+    printf("AFTER\n");
     PyObject *result = PyArray_SimpleNew(2, dims, NPY_INT64);
     long long *result_data = PyArray_DATA((PyArrayObject *)result);
     for (int i = 0; i < (int)dims[0]; i++)
     {
         for(int j = 0; j < (int)dims[1]; j++)
         {
-            result_data[i*dims[1] + j] = 2*data[i*dims[1] + j];
+            result_data[i*dims[1] + j] = data[i*dims[1] + j];
         }
     }
     return result;
@@ -135,7 +139,6 @@ static PyMethodDef methods[] = {
     {"sum", sum, METH_VARARGS, "Sum all numbers in a matrix."},
     {"sumpy", sumpy, METH_VARARGS, "Sum all numbers in a matrix."},
     {"square_relax", square_relax, METH_VARARGS, "Sum all numbers in a matrix."},
-    {"square_relax2", square_relax2, METH_VARARGS, "Sum all numbers in a matrix."},
     {NULL, NULL, 0, NULL}};
 
 static struct PyModuleDef relax = {
@@ -145,7 +148,7 @@ static struct PyModuleDef relax = {
     -1,
     methods};
 
-PyMODINIT_FUNC PyInit_relax(void) { // here we set the name of the module
+PyMODINIT_FUNC PyInit_cnisip(void) { // here we set the name of the module
     printf("cnisip init\n");
     PyObject *module = PyModule_Create(&relax);
     import_array();
