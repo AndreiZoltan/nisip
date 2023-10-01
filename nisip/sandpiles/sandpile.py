@@ -46,6 +46,13 @@ class Sandpile:
         if 0 < x < self.width - 1 and 0 < y < self.height - 1:
             self.graph[x, y] = z
 
+    def set_graph(self, graph: np.ndarray) -> None:
+        """
+        Set the graph of the sandpile.
+        """
+        assert graph.shape == self.graph.shape
+        self.graph = graph
+
     def set_boundary(self, boundary: np.ndarray) -> None:
         """
         Set the boundary of the sandpile.
