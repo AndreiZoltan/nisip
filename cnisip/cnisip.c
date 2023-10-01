@@ -3,9 +3,7 @@
 #include <Python.h>
 #include <numpy/arrayobject.h>
 #include <stdio.h>
-#include "square_relax2.c"
-
-
+#include "relax_square.c"
 
 
 PyObject *add(PyObject *self, PyObject *args)
@@ -15,62 +13,8 @@ PyObject *add(PyObject *self, PyObject *args)
     return PyFloat_FromDouble(x + y);
 };
 
-// Sum all numbers in a matrix.
-static PyObject *sum(PyObject *self, PyObject *args)
-{
-    PyArrayObject *arr;
-    PyArg_ParseTuple(args, "O", &arr);
-    if (PyErr_Occurred())
-    {
-        return NULL;
-    }
-    if (!PyArray_Check(arr) || PyArray_TYPE(arr) != NPY_DOUBLE || !PyArray_IS_C_CONTIGUOUS(arr)){
-        PyErr_SetString(PyExc_TypeError, "Argument must be C contiguous numpy array of type double.");
-        return NULL;
-    }
 
-    double *data = PyArray_DATA(arr);
-    int64_t size = PyArray_SIZE(arr);
-
-    double total = 0;
-    for (int i = 0; i < size; i++) 
-    {
-        total += data[i];
-    }
-    return PyFloat_FromDouble(total);
-};
-
-static PyObject *sumpy(PyObject *self, PyObject *args)
-{
-    PyArrayObject *arr;
-    PyArg_ParseTuple(args, "O", &arr);
-    if (PyErr_Occurred())
-    {
-        return NULL;
-    }
-    if (!PyArray_Check(arr)){
-        PyErr_SetString(PyExc_TypeError, "Argument must be C contiguous numpy array of type double.");
-        return NULL;
-    }
-
-    double *data;
-    int64_t size = PyArray_SIZE(arr);
-    npy_intp dims[] = {[0] = size};
-    PyArray_AsCArray((PyObject **)&arr, &data, dims, 1, PyArray_DescrFromType(NPY_DOUBLE));
-    if (PyErr_Occurred())
-    {
-        return NULL;
-    }
-
-    double total = 0;
-    for (int i = 0; i < size; i++) 
-    {
-        total += data[i];
-    }
-    return PyFloat_FromDouble(total);
-};
-
-static PyObject *square_relax(PyObject *self, PyObject *args)
+static PyObject *relax_square(PyObject *self, PyObject *args)
 {
     PyArrayObject *arr;
     PyArg_ParseTuple(args, "O", &arr);
@@ -102,13 +46,12 @@ static PyObject *square_relax(PyObject *self, PyObject *args)
     long long **_data;
     int64_t size = PyArray_SIZE(arr);
     npy_intp *dims = PyArray_DIMS(arr);
+    arr = PyArray_Cast(arr, NPY_INT64);
     PyArray_AsCArray((PyObject **)&arr, &_data, dims, 2, PyArray_DescrFromType(NPY_INT64));
     if (PyErr_Occurred())
     {
         return NULL;
     }
-    printf("dims[0] = %ld\n", dims[0]);
-    printf("dims[1] = %ld\n", dims[1]);
     long long *data;
     data = malloc(size*sizeof(long long));
     for (int i = 0; i < (int)dims[0]; i++)
@@ -118,9 +61,7 @@ static PyObject *square_relax(PyObject *self, PyObject *args)
             data[i*dims[0] + j] = _data[i][j];
         }
     }
-    printf("BEFORE\n");
-    square_relax_simple(data, (int)dims[0], (int)dims[1]);
-    printf("AFTER\n");
+    relax_square_trivial_boundary(data, (int)dims[0], (int)dims[1]);
     PyObject *result = PyArray_SimpleNew(2, dims, NPY_INT64);
     long long *result_data = PyArray_DATA((PyArrayObject *)result);
     for (int i = 0; i < (int)dims[0]; i++)
@@ -136,21 +77,19 @@ static PyObject *square_relax(PyObject *self, PyObject *args)
 
 static PyMethodDef methods[] = {
     {"add", add, METH_VARARGS, "Add two numbers."},
-    {"sum", sum, METH_VARARGS, "Sum all numbers in a matrix."},
-    {"sumpy", sumpy, METH_VARARGS, "Sum all numbers in a matrix."},
-    {"square_relax", square_relax, METH_VARARGS, "Sum all numbers in a matrix."},
+    {"relax_square", relax_square, METH_VARARGS, "Sum all numbers in a matrix."},
     {NULL, NULL, 0, NULL}};
 
-static struct PyModuleDef relax = {
+static struct PyModuleDef cnisip = {
     PyModuleDef_HEAD_INIT,
-    "relax",
-    "relax the sandpile",
+    "cnisip",
+    "C module for sandpile manipulations",
     -1,
     methods};
 
 PyMODINIT_FUNC PyInit_cnisip(void) { // here we set the name of the module
     printf("cnisip init\n");
-    PyObject *module = PyModule_Create(&relax);
+    PyObject *module = PyModule_Create(&cnisip);
     import_array();
     return module;
 };
