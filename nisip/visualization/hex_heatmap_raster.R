@@ -51,13 +51,13 @@ matrix2color2 <- function(matrix, colormap = "viridis") {
 rows <- dim(heatmap_matrix)[1]
 cols <- dim(heatmap_matrix)[2]
 
-png(output_path, width = cols * 150, height = rows * 150, res = 100)
+png(output_path, width = cols * 120, height = rows * 90, res = 100)
 
 par(mar = c(0.4, 2, 2, 7))
 
 plot(0, 0, type = "n", axes = FALSE,
-     xlim = c(-cols, 2*cols),
-     ylim = c(-rows, rows),
+     xlim = c(0, cols),
+     ylim = c(-rows, rows/2),
      xlab = "", ylab = "", asp = 1)
 
 col_ramp <- rev(viridis(50, option = "magma"))
