@@ -9,7 +9,7 @@ nisip_path = Path(__file__).parent.parent.parent
 
 import numpy as np
 
-from nisip import Sandpile
+from nisip.sandpiles import Sandpile
 from nisip.visualization.hex_heatmap_vector import hex_heatmap_vec
 from nisip.visualization.hex_heatmap_raster import hex_heatmap_raster
 
@@ -49,14 +49,13 @@ def save(sandpile: Sandpile, imsave=True, folder=None) -> None:
     if not res.fetchall():
         cur.execute(
             "CREATE TABLE dunes (id INTEGER PRIMARY KEY,\
-                    folder TEXT, grains INTEGER, width INTEGER, height INTEGER, tiling TEXT,\
+                    folder TEXT, grains INTEGER, rows INTEGER, cols INTEGER, tiling TEXT,\
                     is_directed BOOLEAN)"
         )
     check_integrity()
     current_time = datetime.datetime.now()
     if folder is None:
         folder = current_time.strftime("%Y_%m_%d_%H_%M_%S")
-    # os.makedirs(f"{dunes_path}/{folder}", exist_ok=False)
     os.makedirs(f"{dunes_path}/{folder}", exist_ok=True)
     # save graph matrix
     current = current_time.strftime("%Y_%m_%d_%H_%M_%S")
@@ -64,10 +63,13 @@ def save(sandpile: Sandpile, imsave=True, folder=None) -> None:
     np.savetxt(graph_path, sandpile.get_graph(), delimiter=",", fmt="%i")
     # save image
     assert ncolors(sandpile.tiling) == 6
+    # if imsave:
+    #     hex_heatmap_raster(
+    #         graph_path, f"{dunes_path}/{folder}/graph.png", ncolors(sandpile.tiling)
+    #     )
     if imsave:
-        hex_heatmap_raster(
-            graph_path, f"{dunes_path}/{folder}/graph.png", ncolors(sandpile.tiling)
-        )
+        subprocess.run(["Rscript", f"{nisip_path}/nisip/visualization/hex_heatmap_raster.R",
+                        graph_path, f"{dunes_path}/{folder}/graph.png"])
     # hex_heatmap_vec(
     #     graph_path, f"{dunes_path}/{folder}/graph.svg", ncolors(sandpile.tiling)
     # )
@@ -83,13 +85,13 @@ def save(sandpile: Sandpile, imsave=True, folder=None) -> None:
     with open(f"{dunes_path}/{folder}/meta_{current}.json", "w") as f:
         json.dump(sandpile.meta, f)
     cur.execute(
-        """INSERT INTO dunes (folder, grains, width, height, tiling, is_directed)
+        """INSERT INTO dunes (folder, grains, rows, cols, tiling, is_directed)
                VALUES (?, ?, ?, ?, ?, ?)""",
         (
             folder,
             sandpile.grains,
-            sandpile.width,
-            sandpile.height,
+            sandpile.rows,
+            sandpile.cols,
             sandpile.tiling,
             sandpile.is_directed,
         ),

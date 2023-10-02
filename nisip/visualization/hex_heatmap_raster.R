@@ -12,8 +12,6 @@ print(file_path)
 print(output_path)
 heatmap_matrix <- read.csv(file_path, header = FALSE, sep = ",")
 heatmap_matrix <- as.matrix(heatmap_matrix)
-print("THE VERY FIRST ELEMENT")
-print(heatmap_matrix[1][1])
 
 hexagon <- function(x, y, unitcell = 1, col = col) {
   polygon(c(x,
@@ -32,13 +30,8 @@ hexagon <- function(x, y, unitcell = 1, col = col) {
 }
 matrix2color <- function(matrix, colormap = "viridis") {
   matrix <- as.matrix(matrix)
-  print("matrix before")
-  print(matrix)
   col_ramp <- scales::col_numeric(colormap, domain = c(0, 1))  # Adjust domain to 0-1
   matrix <- (matrix - min(matrix, na.rm = TRUE)) / (max(matrix, na.rm = TRUE) - min(matrix, na.rm = TRUE))  # Scale to 0-1
-  print("matrix")
-  print(matrix[1][1])
-  print("+-+-+-+-+-+-+-+-")
   colors <- col_ramp(matrix)
   dim(colors) <- c(dim(matrix))
   return(colors)
@@ -46,32 +39,25 @@ matrix2color <- function(matrix, colormap = "viridis") {
 
 matrix2color2 <- function(matrix, colormap = "viridis") {
   matrix <- as.matrix(matrix)
-  print("matrix before")
-  print(matrix)
   col_ramp <- scales::col_numeric(colormap, domain = range(matrix))
   # matrix <- (matrix + 1) / 7
   matrix <- (matrix - min(matrix)) / diff(range(matrix))
-  print("matrix")
-  print(matrix[1][1])
-  # print("max", max(matrix))
-  # print("min", min(matrix))
-  print("+-+-+-+-+-+-+-+-")
   colors <- col_ramp(matrix)
   dim(colors) <- c(dim(matrix))
   return(colors)
 }
 
 
-height <- dim(heatmap_matrix)[1]
-width <- dim(heatmap_matrix)[2]
+rows <- dim(heatmap_matrix)[1]
+cols <- dim(heatmap_matrix)[2]
 
-png(output_path, width = width * 150, height = height * 150, res = 100)
+png(output_path, width = cols * 150, height = rows * 150, res = 100)
 
 par(mar = c(0.4, 2, 2, 7))
 
 plot(0, 0, type = "n", axes = FALSE,
-     xlim = c(-width, 2*width),
-     ylim = c(-height, height),
+     xlim = c(-cols, 2*cols),
+     ylim = c(-rows, rows),
      xlab = "", ylab = "", asp = 1)
 
 col_ramp <- rev(viridis(50, option = "magma"))
@@ -80,22 +66,13 @@ heatmap_matrix <- matrix2color(heatmap_matrix, colormap = "viridis")
 
 
 offset <- 0
-print(height)
-print(width)
-print(heatmap_matrix)
-print('=======')
-for (row in 1:height) {
-  for (column in 1:width){
-    print(row)
-    print(column)
-    print(heatmap_matrix[row, column])
-    print('___')
+for (row in 1:rows) {
+  for (column in 1:cols){
     x <- column + offset
     y <- row
     hexagon(x, -y, col = heatmap_matrix[row, column])
   }
   offset <- offset + 0.5
 }
-print(heatmap_matrix)
 
 dev.off()

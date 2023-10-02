@@ -1,3 +1,3 @@
-__all__ = ["Sandpile", "relax", "save"]
-from .sandpiles.sandpile import Sandpile
+__all__ = ["Sandpile", "DirectedSandpile", "relax", "save", "add"]
+from .sandpiles import Sandpile, DirectedSandpile
 from .core import relax, save, add

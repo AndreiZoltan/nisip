@@ -33,7 +33,7 @@ def create_from_meta(meta: dict) -> Sandpile:
     """
     Create a sandpile from a metadata dictionary.
     """
-    sandpile = Sandpile(int(meta["width"]), int(meta["height"]), meta["tiling"])
+    sandpile = Sandpile(int(meta["rows"]), int(meta["cols"]), meta["tiling"])
     for x, y, z in np.array(meta["history"], dtype=np.int64):
         sandpile.add(x, y, z)
         sandpile = relax(sandpile)
@@ -44,7 +44,7 @@ def create_from_meta_cache(meta: dict) -> Sandpile:
     """
     Create a sandpile from a metadata dictionary.
     """
-    sandpile = Sandpile(int(meta["width"]), int(meta["height"]), meta["tiling"])
+    sandpile = Sandpile(int(meta["rows"]), int(meta["cols"]), meta["tiling"])
     assert sandpile.tiling == meta["tiling"]
     for x, y, z in np.array(meta["history"], dtype=np.int64):
         sandpile.add(x, y, z)
@@ -62,19 +62,19 @@ def drop_sand_cache_test(graph, meta):
 
 
 @pytest.mark.parametrize(
-    "width, height, tiling, x, y, z",
+    "rows, cols, tiling, x, y, z",
     [
         [3, 3, "square", 1, 1, 10],
     ],
 )
-def drop_sand_boundary_test(width, height, tiling, x, y, z):
+def drop_sand_boundary_test(rows, cols, tiling, x, y, z):
     if tiling == "square":
         max_grain = 3
     elif tiling == "triangular":
         max_grain = 5
     else:
         max_grain = 2
-    sandpile = Sandpile(width, height, tiling)
+    sandpile = Sandpile(rows, cols, tiling)
     sandpile.add(x, y, z)
     sandpile = relax(sandpile)
     assert np.max(sandpile.graph) <= max_grain
