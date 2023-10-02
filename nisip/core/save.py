@@ -68,8 +68,14 @@ def save(sandpile: Sandpile, imsave=True, folder=None) -> None:
     #         graph_path, f"{dunes_path}/{folder}/graph.png", ncolors(sandpile.tiling)
     #     )
     if imsave:
-        subprocess.run(["Rscript", f"{nisip_path}/nisip/visualization/hex_heatmap_raster.R",
-                        graph_path, f"{dunes_path}/{folder}/graph.png"])
+        subprocess.run(
+            [
+                "Rscript",
+                f"{nisip_path}/nisip/visualization/hex_heatmap_raster.R",
+                graph_path,
+                f"{dunes_path}/{folder}/graph.png",
+            ]
+        )
     # hex_heatmap_vec(
     #     graph_path, f"{dunes_path}/{folder}/graph.svg", ncolors(sandpile.tiling)
     # )

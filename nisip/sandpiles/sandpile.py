@@ -21,9 +21,7 @@ class Sandpile:
         self.is_trivial_boundary = True
 
     def __repr__(self) -> str:
-        return (
-            f"Sandpile(rows={self.rows}, cols={self.cols}, tiling={self.tiling})"
-        )
+        return f"Sandpile(rows={self.rows}, cols={self.cols}, tiling={self.tiling})"
 
     def add(self, x: int, y: int, z: int) -> None:
         """

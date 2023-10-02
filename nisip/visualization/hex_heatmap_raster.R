@@ -66,7 +66,7 @@ heatmap_matrix <- matrix2color(heatmap_matrix, colormap = "viridis")
 
 
 offset <- 0
-for (row in 1:rows) {
+for (row in rows:1) {
   for (column in 1:cols){
     x <- column + offset
     y <- row
