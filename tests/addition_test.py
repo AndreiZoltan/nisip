@@ -15,7 +15,7 @@ sys.path.append(r"{}/{}".format(parent_dir, "nisip"))
 
 test_path = Path(__file__).parent
 from sandpiles import Sandpile  # type: ignore
-from core import drop_sand, drop_sand_cache  # type: ignore
+from core import relax  # type: ignore
 
 # from nisip import save
 files = os.listdir(f"{test_path}/true_data")
@@ -35,7 +35,8 @@ def create_from_meta(meta: dict) -> Sandpile:
     """
     sandpile = Sandpile(int(meta["width"]), int(meta["height"]), meta["tiling"])
     for x, y, z in np.array(meta["history"], dtype=np.int64):
-        sandpile = drop_sand(sandpile, x, y, z)
+        sandpile.add(x, y, z)
+        sandpile = relax(sandpile)
     return sandpile
 
 
@@ -44,18 +45,11 @@ def create_from_meta_cache(meta: dict) -> Sandpile:
     Create a sandpile from a metadata dictionary.
     """
     sandpile = Sandpile(int(meta["width"]), int(meta["height"]), meta["tiling"])
+    assert sandpile.tiling == meta["tiling"]
     for x, y, z in np.array(meta["history"], dtype=np.int64):
-        sandpile = drop_sand_cache(sandpile, x, y, z)
+        sandpile.add(x, y, z)
+        sandpile = relax(sandpile)
     return sandpile
-
-
-# @pytest.mark.parametrize("graph, meta", test_list)
-# def drop_sand_test(graph, meta):
-#     graph = np.loadtxt(f"{test_path}/true_data/{graph}", delimiter=",")
-#     with open(f"{test_path}/true_data/{meta}") as f:
-#         meta = json.load(f)
-#     sandpile = create_from_meta(meta)
-#     assert np.array_equal(sandpile.graph, graph)
 
 
 @pytest.mark.parametrize("graph, meta", test_list)
@@ -80,10 +74,11 @@ def drop_sand_boundary_test(width, height, tiling, x, y, z):
         max_grain = 5
     else:
         max_grain = 2
-    sand = Sandpile(width, height, tiling)
-    sand = drop_sand(sand, x, y, z)
-    assert np.max(sand.graph) <= max_grain
-    assert np.max(sand.graph[0]) == 0
-    assert np.max(sand.graph[-1]) == 0
-    assert np.max(sand.graph[:, 0]) == 0
-    assert np.max(sand.graph[:, -1]) == 0
+    sandpile = Sandpile(width, height, tiling)
+    sandpile.add(x, y, z)
+    sandpile = relax(sandpile)
+    assert np.max(sandpile.graph) <= max_grain
+    assert np.max(sandpile.graph[0]) == 0
+    assert np.max(sandpile.graph[-1]) == 0
+    assert np.max(sandpile.graph[:, 0]) == 0
+    assert np.max(sandpile.graph[:, -1]) == 0
