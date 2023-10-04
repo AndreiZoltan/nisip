@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include "relax_square.c"
 #include "relax_triangular.c"
+#include "random_triangular.c"
 
 
 PyObject *add(PyObject *self, PyObject *args)
@@ -44,6 +45,11 @@ static PyObject *relax_square(PyObject *self, PyObject *args)
         return NULL;
     }
     PyObject *result = PyArray_SimpleNew(2, dims, NPY_INT64);
+    if (!PyArray_IS_C_CONTIGUOUS(result))
+    {
+        printf("Python created not contiguous array\n");
+        return NULL;
+    }
     long long *result_data = PyArray_DATA((PyArrayObject *)result);
     for (int i = 0; i < (int)dims[0]; i++)
     {
@@ -85,6 +91,11 @@ static PyObject *relax_triangular(PyObject *self, PyObject *args)
         return NULL;
     }
     PyObject *result = PyArray_SimpleNew(2, dims, NPY_INT64);
+    if (!PyArray_IS_C_CONTIGUOUS(result))
+    {
+        printf("Python created not contiguous array\n");
+        return NULL;
+    }
     long long *result_data = PyArray_DATA((PyArrayObject *)result);
     for (int i = 0; i < (int)dims[0]; i++)
     {
@@ -127,6 +138,11 @@ static PyObject *relax_triangular_directed(PyObject *self, PyObject *args)
         return NULL;
     }
     PyObject *result = PyArray_SimpleNew(2, dims, NPY_INT64);
+    if (!PyArray_IS_C_CONTIGUOUS(result))
+    {
+        printf("Python created not contiguous array\n");
+        return NULL;
+    }
     long long *result_data = PyArray_DATA((PyArrayObject *)result);
     for (int i = 0; i < (int)dims[0]; i++)
     {
@@ -139,11 +155,34 @@ static PyObject *relax_triangular_directed(PyObject *self, PyObject *args)
     return result;
 };
 
+
+static PyObject *random_triangular_graph(PyObject *self, PyObject *args)
+{
+    int rows, cols;
+    PyArg_ParseTuple(args, "ii", &rows, &cols);
+    if (PyErr_Occurred())
+    {
+        return NULL;
+    }
+    npy_intp dims[2] = {2*rows, cols};
+    PyObject *result = PyArray_ZEROS(2, dims, NPY_INT64, 0);
+    if (!PyArray_IS_C_CONTIGUOUS(result))
+    {
+        printf("Python created not contiguous array\n");
+        return NULL;
+    }
+    long long *result_data = PyArray_DATA((PyArrayObject *)result);
+    random_triangular(result_data, rows, cols);
+    return result;
+};
+
+
 static PyMethodDef methods[] = {
     {"add", add, METH_VARARGS, "Add two numbers."},
     {"relax_square", relax_square, METH_VARARGS, "Relax sandpile on square lattice graph"},
     {"relax_triangular", relax_triangular, METH_VARARGS, "Relax sandpile on triangular lattice graph"},
     {"relax_triangular_directed", relax_triangular_directed, METH_VARARGS, "Relax sandpile on triangular lattice graph with directed edges"},
+    {"random_triangular_graph", random_triangular_graph, METH_VARARGS, "Generate random triangular graph"},
     {NULL, NULL, 0, NULL}};
 
 static struct PyModuleDef cnisip = {
