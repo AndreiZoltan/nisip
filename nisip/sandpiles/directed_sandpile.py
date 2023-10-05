@@ -7,8 +7,14 @@ import cnisip as cns
 
 
 class DirectedSandpile(Sandpile):
-    def __init__(self, rows: int, cols: int, tiling: str="square", directions=(1, 1, -1),
-                 directed_graph: np.ndarray=np.empty(0)) -> None:
+    def __init__(
+        self,
+        rows: int,
+        cols: int,
+        tiling: str = "square",
+        directions=(1, 1, -1),
+        directed_graph: np.ndarray = np.empty(0),
+    ) -> None:
         super().__init__(rows, cols, tiling=tiling)
         self.is_directed = True
         self.directions = np.array(directions)
@@ -22,5 +28,5 @@ class DirectedSandpile(Sandpile):
         self.is_regular = False
         if self.tiling == "triangular":
             random_triangular_graph = cns.random_triangular_graph(self.rows, self.cols)
-            self.directed_graph = random_triangular_graph[:self.rows]
-            self.nodes_degrees = random_triangular_graph[self.rows:]
+            self.directed_graph = random_triangular_graph[: self.rows]
+            self.nodes_degrees = random_triangular_graph[self.rows :]

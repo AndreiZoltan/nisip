@@ -177,12 +177,82 @@ static PyObject *random_triangular_graph(PyObject *self, PyObject *args)
 };
 
 
+static PyObject *relax_triangular_directed_irregular(PyObject *self, PyObject *args)
+{
+    PyArrayObject *graph, *directions, *degrees;
+    PyArg_ParseTuple(args, "OOO", &graph, &directions, &degrees);
+    if (PyErr_Occurred())
+    {
+        return NULL;
+    }
+    if (!PyArray_Check(graph) || !PyArray_Check(directions) || !PyArray_Check(degrees))
+    {
+        PyErr_SetString(PyExc_TypeError, "Argument must be numpy array.");
+        return NULL;
+    }
+    if (PyErr_Occurred())
+    {
+        printf("error after **data\n");
+        return NULL;
+    }
+    
+    long long **graph_data, **directions_data, **degrees_data;
+    int64_t size = PyArray_SIZE(graph);
+    npy_intp *dims = PyArray_DIMS(graph);
+    graph = PyArray_Cast(graph, NPY_INT64);
+    PyArray_AsCArray((PyObject **)&graph, &graph_data, dims, 2, PyArray_DescrFromType(NPY_INT64));
+    if (PyErr_Occurred())
+    {
+        return NULL;
+    }
+    directions = PyArray_Cast(directions, NPY_INT64);
+    PyArray_AsCArray((PyObject **)&directions, &directions_data, dims, 2, PyArray_DescrFromType(NPY_INT64));
+    if (PyErr_Occurred())
+    {
+        return NULL;
+    }
+    degrees = PyArray_Cast(degrees, NPY_INT64);
+    PyArray_AsCArray((PyObject **)&degrees, &degrees_data, dims, 2, PyArray_DescrFromType(NPY_INT64));
+    if (PyErr_Occurred())
+    {
+        return NULL;
+    }
+    long long *ptr = (int *)malloc(2*size*sizeof(long long));
+    for (int i = 0; i < (int)dims[0]; i++)
+    {
+        for(int j = 0; j < (int)dims[1]; j++)
+        {
+            ptr[i*2*dims[1] + 2*j] = graph_data[i][j];
+            ptr[i*2*dims[1] + 2*j + 1] = directions_data[i][j];
+            ptr[i*2*dims[1] + 2*j + 1] += degrees_data[i][j]<<6;
+        }
+    }
+    relax_triangular_directed_irregular_trivial_boundary(ptr, (int)dims[0], (int)dims[1]);
+    PyObject *result = PyArray_SimpleNew(2, dims, NPY_INT64);
+    if (!PyArray_IS_C_CONTIGUOUS(result))
+    {
+        printf("Python created not contiguous array\n");
+        return NULL;
+    }
+    long long *result_data = PyArray_DATA((PyArrayObject *)result);
+    for (int i = 0; i < (int)dims[0]; i++)
+    {
+        for(int j = 0; j < (int)dims[1]; j++)
+        {
+            result_data[i*dims[1] + j] = ptr[i*2*dims[1] + 2*j];
+        }
+    }
+    return result;
+};
+
+
 static PyMethodDef methods[] = {
     {"add", add, METH_VARARGS, "Add two numbers."},
     {"relax_square", relax_square, METH_VARARGS, "Relax sandpile on square lattice graph"},
     {"relax_triangular", relax_triangular, METH_VARARGS, "Relax sandpile on triangular lattice graph"},
     {"relax_triangular_directed", relax_triangular_directed, METH_VARARGS, "Relax sandpile on triangular lattice graph with directed edges"},
     {"random_triangular_graph", random_triangular_graph, METH_VARARGS, "Generate random triangular graph"},
+    {"relax_triangular_directed_irregular", relax_triangular_directed_irregular, METH_VARARGS, "Relax sandpile on triangular lattice graph with directed edges"},
     {NULL, NULL, 0, NULL}};
 
 static struct PyModuleDef cnisip = {

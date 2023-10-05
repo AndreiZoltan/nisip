@@ -30,10 +30,22 @@ def relax(
     elif sandpile.tiling == "triangular":
         if sandpile.is_directed:
             assert isinstance(sandpile, DirectedSandpile)
-            if sandpile.is_trivial_boundary:
-                sandpile.set_graph(
-                    cns.relax_triangular_directed(sandpile.graph, *sandpile.directions)
-                )
+            if sandpile.is_regular:
+                if sandpile.is_trivial_boundary:
+                    sandpile.set_graph(
+                        cns.relax_triangular_directed(
+                            sandpile.graph, *sandpile.directions
+                        )
+                    )
+            else:
+                if sandpile.is_trivial_boundary:
+                    sandpile.set_graph(
+                        cns.relax_triangular_directed_irregular(
+                            sandpile.graph,
+                            sandpile.directed_graph,
+                            sandpile.nodes_degrees,
+                        )
+                    )
         else:
             if sandpile.is_trivial_boundary:
                 sandpile.set_graph(cns.relax_triangular(sandpile.graph))
