@@ -51,6 +51,9 @@ class Sandpile:
         assert graph.shape == self.graph.shape
         self.graph = graph
 
+    def get_graph(self):
+        return self.graph.astype(np.int64)
+
     def set_boundary(self, boundary: np.ndarray) -> None:
         """
         Set the boundary of the sandpile.
@@ -79,13 +82,10 @@ class Sandpile:
         """
         return {
             "id": self.id,
-            "width": self.rows,
-            "height": self.cols,
+            "rows": self.rows,
+            "cols": self.cols,
             "tiling": self.tiling,
             "is_directed": self.is_directed,
             "grains": self.grains,
             "history": self.history.tolist(),
         }
-
-    def get_graph(self):
-        return self.graph.astype(np.int64)
