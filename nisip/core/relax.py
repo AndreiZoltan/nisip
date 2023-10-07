@@ -49,10 +49,4 @@ def relax(
         else:
             if sandpile.is_trivial_boundary:
                 sandpile.set_graph(cns.relax_triangular(sandpile.graph))
-            else:
-                sandpile.set_graph(
-                    cns.relax_triangular_non_trivial_boundary(
-                        sandpile.graph, sandpile.boundary
-                    )
-                )
     return sandpile

@@ -18,6 +18,7 @@ class Sandpile:
         self.boundary = np.zeros((rows, cols), dtype=np.int64)
         self.boundary[:, 0::cols] = 1
         self.boundary[0::rows, :] = 1
+        self.is_trivial_boundary = True
 
     def __repr__(self) -> str:
         return f"Sandpile(rows={self.rows}, cols={self.cols}, tiling={self.tiling})"
@@ -59,14 +60,7 @@ class Sandpile:
         """
         assert boundary.shape == self.boundary.shape
         self.boundary = boundary
-
-    def set_trivial_boundary(self) -> None:
-        """
-        Set the boundary of the sandpile to trivial.
-        """
-        self.boundary = np.zeros((self.rows, self.cols), dtype=np.int64)
-        self.boundary[:, 0 :: self.cols] = 1
-        self.boundary[0 :: self.rows, :] = 1
+        self.is_trivial_boundary = False
 
     def add_history(self, x: int, y: int, z: int) -> None:
         """
@@ -95,20 +89,3 @@ class Sandpile:
             "grains": self.grains,
             "history": self.history.tolist(),
         }
-
-    @property
-    def is_trivial_boundary(self) -> bool:
-        """
-        Return True if the boundary is trivial.
-        """
-        if (
-            (self.boundary[:, 0 :: self.cols] == 1).all()
-            and (self.boundary[0 :: self.rows, :] == 1).all()
-            and (self.boundary[1 : self.rows - 1, 1 : self.cols - 1] == 0).all()
-        ):
-            return True
-        return False
-
-    @property
-    def shape(self):
-        return self.graph.shape
