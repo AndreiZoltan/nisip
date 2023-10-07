@@ -1,3 +1,2 @@
 from .sandpile import Sandpile
-
-# from .basesandpile import BaseSandpile
+from .directed_sandpile import DirectedSandpile

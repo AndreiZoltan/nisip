@@ -1,12 +1,15 @@
 from copy import deepcopy
+from typing import Union
 
 import numpy as np
 
-from nisip.sandpiles.sandpile import Sandpile
+from nisip.sandpiles import Sandpile, DirectedSandpile
 import cnisip as cns
 
 
-def relax(sandpile: Sandpile) -> Sandpile:
+def relax(
+    sandpile: Union[Sandpile, DirectedSandpile]
+) -> Union[Sandpile, DirectedSandpile]:
     """
     Relax the sandpile until it is stable.
 
@@ -24,7 +27,26 @@ def relax(sandpile: Sandpile) -> Sandpile:
     if sandpile.tiling == "square":
         if sandpile.is_trivial_boundary:
             sandpile.set_graph(cns.relax_square(sandpile.graph))
-    if sandpile.tiling == "triangular":
-        if sandpile.is_trivial_boundary:
-            sandpile.set_graph(cns.relax_triangular(sandpile.graph))
+    elif sandpile.tiling == "triangular":
+        if sandpile.is_directed:
+            assert isinstance(sandpile, DirectedSandpile)
+            if sandpile.is_regular:
+                if sandpile.is_trivial_boundary:
+                    sandpile.set_graph(
+                        cns.relax_triangular_directed(
+                            sandpile.graph, *sandpile.directions
+                        )
+                    )
+            else:
+                if sandpile.is_trivial_boundary:
+                    sandpile.set_graph(
+                        cns.relax_triangular_directed_irregular(
+                            sandpile.graph,
+                            sandpile.directed_graph,
+                            sandpile.nodes_degrees,
+                        )
+                    )
+        else:
+            if sandpile.is_trivial_boundary:
+                sandpile.set_graph(cns.relax_triangular(sandpile.graph))
     return sandpile
