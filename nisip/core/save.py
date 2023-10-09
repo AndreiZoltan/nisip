@@ -76,6 +76,13 @@ def save_data(sandpile: Sandpile, folder: str) -> str:
                 delimiter=",",
                 fmt="%i",
             )
+    elif not sandpile.is_trivial_boundary:
+        np.savetxt(
+            f"{dunes_path}/{folder}/boundary_{current}.csv",
+            sandpile.boundary,
+            delimiter=",",
+            fmt="%i",
+        )
 
     np.savetxt(
         f"{dunes_path}/{folder}/history_{current}.csv",
@@ -129,7 +136,7 @@ def update_sqlite(
     con.commit()
 
 
-def save(sandpile: Sandpile, imsave=True, folder: str = "") -> None:
+def save(sandpile: Sandpile, folder: str = "", imsave=True) -> None:
     """
     Write a sandpile to a png file.
     """

@@ -3,6 +3,7 @@
 #include <Python.h>
 #include <numpy/arrayobject.h>
 #include <stdio.h>
+#include "relax_triangular.h"
 #include "relax_square.c"
 #include "relax_triangular.c"
 #include "random_triangular.c"
@@ -290,7 +291,7 @@ static PyObject *relax_triangular_non_trivial_boundary(PyObject *self, PyObject 
             ptr[i*2*dims[1] + 2*j + 1] = boundary_data[i][j];
         }
     }
-    relax_triangular_non_trivial_boundary(ptr, (int)dims[0], (int)dims[1]);
+    relax_triangular_non_directed_non_trivial_boundary(ptr, (int)dims[0], (int)dims[1]);
     PyObject *result = PyArray_SimpleNew(2, dims, NPY_INT64);
     if (!PyArray_IS_C_CONTIGUOUS(result))
     {

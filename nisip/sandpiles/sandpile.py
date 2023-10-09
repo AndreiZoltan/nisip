@@ -1,3 +1,4 @@
+from nntplib import NNTPDataError
 import random
 import json
 
@@ -15,12 +16,13 @@ class Sandpile:
         self.is_directed = False
         self.history = np.empty((0, 3))
 
-        self.boundary = np.zeros((rows, cols), dtype=np.int64)
-        self.boundary[:, 0::cols] = 1
-        self.boundary[0::rows, :] = 1
+        boundary = np.zeros((rows, cols), dtype=np.int64)
+        boundary[:, 0::cols] = 1
+        boundary[0::rows, :] = 1
+        self.set_boundary(boundary)
 
     def __repr__(self) -> str:
-        return f"Sandpile(rows={self.rows}, cols={self.cols}, tiling={self.tiling})"
+        return f"Sandpile(rows={self.rows}, cols={self.cols}, tiling={self.tiling}, is_directed={self.is_directed}, grains={self.grains})"
 
     def add(self, x: int, y: int, z: int) -> None:
         """
@@ -57,7 +59,7 @@ class Sandpile:
         """
         Set the boundary of the sandpile.
         """
-        assert boundary.shape == self.boundary.shape
+        assert boundary.shape == (self.rows, self.cols)
         self.boundary = boundary
 
     def set_trivial_boundary(self) -> None:
@@ -94,6 +96,7 @@ class Sandpile:
             "is_directed": self.is_directed,
             "grains": self.grains,
             "history": self.history.tolist(),
+            "is_trivial_boundary": self.is_trivial_boundary,
         }
 
     @property
@@ -112,3 +115,10 @@ class Sandpile:
     @property
     def shape(self):
         return self.graph.shape
+
+    @property
+    def is_regular(self):
+        """
+        Return True if the sandpile is regular.
+        """
+        return True

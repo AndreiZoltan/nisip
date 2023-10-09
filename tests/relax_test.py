@@ -26,6 +26,9 @@ def get_test_list():
     directed_graphs = sorted(
         [graph for graph in files if graph.startswith("directed_graph_")]
     )
+    boundary = sorted(
+        [boundary for boundary in files if boundary.startswith("boundary_")]
+    )
     metas = sorted([meta for meta in files if meta.startswith("meta_")])
     graphs_id = [graph.replace("graph_", "") for graph in graphs]
     graphs_id = [graph.replace(".csv", "") for graph in graphs_id]
@@ -35,20 +38,31 @@ def get_test_list():
     directed_graphs = [
         f"directed_{graph}" if f"directed_{graph}" in files else "" for graph in graphs
     ]
-    return list(zip(graphs, metas, directed_graphs))
+    boundary = [
+        f"boundary_{'_'.join(graph.split('_')[1:])}"
+        if f"boundary_{'_'.join(graph.split('_')[1:])}" in files
+        else ""
+        for graph in graphs
+    ]
+    return list(zip(graphs, metas, directed_graphs, boundary))
 
 
-@pytest.mark.parametrize("graph, meta, directed_graph", get_test_list())
-def relax_test(graph, meta, directed_graph):
+@pytest.mark.parametrize("graph, meta, directed_graph, boundary", get_test_list())
+def relax_test(graph, meta, directed_graph, boundary):
     with open(f"{test_path}/{true_data}/{meta}") as f:
         meta = json.load(f)
-    if directed_graph:
-        directed_graph = np.loadtxt(
-            f"{test_path}/{true_data}/{directed_graph}", delimiter=",", dtype=np.int64
+    if meta["is_directed"]:
+        if not meta["is_regular"]:
+            directed_graph = np.loadtxt(
+                f"{test_path}/{true_data}/{directed_graph}",
+                delimiter=",",
+                dtype=np.int64,
+            )
+    if not meta["is_trivial_boundary"]:
+        boundary = np.loadtxt(
+            f"{test_path}/{true_data}/{boundary}", delimiter=",", dtype=np.int64
         )
-        sandpile = create_from_meta(meta, directed_graph=directed_graph)
-    else:
-        sandpile = create_from_meta(meta)
+    sandpile = create_from_meta(meta, directed_graph=directed_graph, boundary=boundary)
     graph = np.loadtxt(
         f"{test_path}/{true_data}/{graph}", delimiter=",", dtype=np.int64
     )
