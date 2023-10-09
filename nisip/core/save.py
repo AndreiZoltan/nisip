@@ -53,10 +53,10 @@ def init_sqlite() -> tuple:
     return con, cur
 
 
-def save_data(sandpile: Sandpile, folder: str) -> str:
+def save_data(sandpile: Sandpile, folder: str = "") -> tuple:
     current_time = datetime.datetime.now()
     current = current_time.strftime("%Y_%m_%d_%H_%M_%S")
-    if folder is None:
+    if not folder:
         folder = current
     os.makedirs(f"{dunes_path}/{folder}", exist_ok=True)
     graph_path = f"{dunes_path}/{folder}/graph_{current}.csv"
@@ -92,10 +92,12 @@ def save_data(sandpile: Sandpile, folder: str) -> str:
     )
     with open(f"{dunes_path}/{folder}/meta_{current}.json", "w") as f:
         json.dump(sandpile.meta, f)
-    return graph_path
+    return graph_path, folder
 
 
-def save_image(sandpile: Sandpile, graph_path: str, folder: str, imsave: bool = True):
+def save_image(
+    sandpile: Sandpile, graph_path: str, folder: str = "", imsave: bool = True
+):
     assert ncolors(sandpile.tiling) == 6
     # if imsave:
     #     hex_heatmap_raster(
@@ -142,7 +144,7 @@ def save(sandpile: Sandpile, folder: str = "", imsave=True) -> None:
     """
     # if directory nisip_path/dunes does not exist, create it
     con, cur = init_sqlite()
-    graph_path = save_data(sandpile, folder)
+    graph_path, folder = save_data(sandpile, folder)
     save_image(sandpile, graph_path, folder, imsave)
     update_sqlite(sandpile, folder, con, cur)
 
