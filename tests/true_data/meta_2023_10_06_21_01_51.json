@@ -1,1 +1,1 @@
-{"id": 89509996222967946838493087829612514299, "rows": 10, "cols": 10, "tiling": "triangular", "is_directed": true, "grains": 0, "history": [], "is_regular": true, "directions": [1, 1, -1]}
+{"id": 89509996222967946838493087829612514299, "rows": 10, "cols": 10, "tiling": "triangular", "is_directed": true, "grains": 0, "history": [], "is_regular": true, "directions": [1, 1, -1],"is_trivial_boundary":true}
