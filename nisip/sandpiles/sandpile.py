@@ -60,6 +60,7 @@ class Sandpile:
         Set the boundary of the sandpile.
         """
         assert boundary.shape == (self.rows, self.cols)
+        assert set(np.unique(boundary)) == {0, 1}
         self.boundary = boundary
 
     def set_trivial_boundary(self) -> None:
