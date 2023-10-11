@@ -46,6 +46,15 @@ def relax(
                             sandpile.nodes_degrees,
                         )
                     )
+                else:
+                    sandpile.set_graph(
+                        cns.relax_triangular_directed_irregular_non_trivial_boundary(
+                            sandpile.graph,
+                            sandpile.directed_graph,
+                            sandpile.nodes_degrees,
+                            sandpile.boundary,
+                        )
+                    )
         else:
             if sandpile.is_trivial_boundary:
                 sandpile.set_graph(cns.relax_triangular(sandpile.graph))

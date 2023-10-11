@@ -27,11 +27,9 @@ def create_from_meta(
         if not meta["is_regular"]:
             sandpile.set_directed_graph(directed_graph)
     else:
-        if meta["is_trivial_boundary"]:
-            sandpile = Sandpile(int(meta["rows"]), int(meta["cols"]), meta["tiling"])
-        else:
-            sandpile = Sandpile(int(meta["rows"]), int(meta["cols"]), meta["tiling"])
-            sandpile.set_boundary(boundary)
+        sandpile = Sandpile(int(meta["rows"]), int(meta["cols"]), meta["tiling"])
+    if not meta["is_trivial_boundary"]:
+        sandpile.set_boundary(boundary)
     for x, y, z in np.array(meta["history"], dtype=np.int64):
         sandpile.add(x, y, z)
         sandpile = relax(sandpile)
