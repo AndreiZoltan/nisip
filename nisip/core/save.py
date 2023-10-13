@@ -76,7 +76,7 @@ def save_data(sandpile: Sandpile, folder: str = "") -> tuple:
                 delimiter=",",
                 fmt="%i",
             )
-    elif not sandpile.is_trivial_boundary:
+    if not sandpile.is_trivial_boundary:
         np.savetxt(
             f"{dunes_path}/{folder}/boundary_{current}.csv",
             sandpile.boundary,
