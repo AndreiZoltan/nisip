@@ -28,7 +28,7 @@ class DirectedSandpile(Sandpile):
             self.directed_graph = directed_graph
             self.nodes_degrees = degrees2nodes(directed_graph)
         else:
-            self.directed_graph = np.empty(0)
+            self.directed_graph = np.empty(0, dtype=np.int64)
 
     def set_random_graph(self):
         if self.tiling == "triangular":
