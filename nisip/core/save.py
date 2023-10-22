@@ -53,10 +53,10 @@ def init_sqlite() -> tuple:
     return con, cur
 
 
-def save_data(sandpile: Sandpile, folder: str) -> str:
+def save_data(sandpile: Sandpile, folder: str = "") -> tuple:
     current_time = datetime.datetime.now()
     current = current_time.strftime("%Y_%m_%d_%H_%M_%S")
-    if folder is None:
+    if not folder:
         folder = current
     os.makedirs(f"{dunes_path}/{folder}", exist_ok=True)
     graph_path = f"{dunes_path}/{folder}/graph_{current}.csv"
@@ -76,6 +76,13 @@ def save_data(sandpile: Sandpile, folder: str) -> str:
                 delimiter=",",
                 fmt="%i",
             )
+    if not sandpile.is_trivial_boundary:
+        np.savetxt(
+            f"{dunes_path}/{folder}/boundary_{current}.csv",
+            sandpile.boundary,
+            delimiter=",",
+            fmt="%i",
+        )
 
     np.savetxt(
         f"{dunes_path}/{folder}/history_{current}.csv",
@@ -85,24 +92,22 @@ def save_data(sandpile: Sandpile, folder: str) -> str:
     )
     with open(f"{dunes_path}/{folder}/meta_{current}.json", "w") as f:
         json.dump(sandpile.meta, f)
-    return graph_path
+    return graph_path, folder, current
 
 
-def save_image(sandpile: Sandpile, graph_path: str, folder: str, imsave: bool = True):
-    assert ncolors(sandpile.tiling) == 6
+def save_image(graph_path: str, folder: str = "", current: str = ""):
     # if imsave:
     #     hex_heatmap_raster(
     #         graph_path, f"{dunes_path}/{folder}/graph.png", ncolors(sandpile.tiling)
     #     )
-    if imsave:
-        subprocess.run(
-            [
-                "Rscript",
-                f"{nisip_path}/nisip/visualization/hex_heatmap_raster.R",
-                graph_path,
-                f"{dunes_path}/{folder}/graph.png",
-            ]
-        )
+    subprocess.run(
+        [
+            "Rscript",
+            f"{nisip_path}/nisip/visualization/hex_heatmap_raster.R",
+            graph_path,
+            f"{dunes_path}/{folder}/graph_{current}.png",
+        ]
+    )
     # hex_heatmap_vec(
     #     graph_path, f"{dunes_path}/{folder}/graph.svg", ncolors(sandpile.tiling)
     # )
@@ -129,14 +134,16 @@ def update_sqlite(
     con.commit()
 
 
-def save(sandpile: Sandpile, imsave=True, folder: str = "") -> None:
+def save(sandpile: Sandpile, folder: str = "", imsave=True) -> None:
     """
     Write a sandpile to a png file.
     """
     # if directory nisip_path/dunes does not exist, create it
+    assert ncolors(sandpile.tiling) == 6
     con, cur = init_sqlite()
-    graph_path = save_data(sandpile, folder)
-    save_image(sandpile, graph_path, folder, imsave)
+    graph_path, folder, current = save_data(sandpile, folder)
+    if imsave:
+        save_image(graph_path, folder, current)
     update_sqlite(sandpile, folder, con, cur)
 
     # print("The image and history were saved in the directory nisip/dunes.")

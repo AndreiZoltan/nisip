@@ -1,0 +1,1 @@
+echo "dunes/*" >> /home/zoltan/sand/nisip/tests/.gitignore

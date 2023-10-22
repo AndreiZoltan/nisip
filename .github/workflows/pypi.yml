@@ -19,6 +19,12 @@ jobs:
               pip install
               build
               --user
+        - name: Install dependencies
+          run: >-
+              python3 -m
+              pip install
+              --user
+              numpy
         - name: Build a binary wheel and a source tarball
           run: >-
               python3 -m

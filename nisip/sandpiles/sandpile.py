@@ -1,3 +1,4 @@
+from nntplib import NNTPDataError
 import random
 import json
 
@@ -15,13 +16,13 @@ class Sandpile:
         self.is_directed = False
         self.history = np.empty((0, 3))
 
-        self.boundary = np.zeros((rows, cols), dtype=np.int64)
-        self.boundary[:, 0::cols] = 1
-        self.boundary[0::rows, :] = 1
-        self.is_trivial_boundary = True
+        boundary = np.zeros((rows, cols), dtype=np.int64)
+        boundary[:, 0::cols] = 1
+        boundary[0::rows, :] = 1
+        self.set_boundary(boundary)
 
     def __repr__(self) -> str:
-        return f"Sandpile(rows={self.rows}, cols={self.cols}, tiling={self.tiling})"
+        return f"Sandpile(rows={self.rows}, cols={self.cols}, tiling={self.tiling}, is_directed={self.is_directed}, grains={self.grains})"
 
     def add(self, x: int, y: int, z: int) -> None:
         """
@@ -58,9 +59,17 @@ class Sandpile:
         """
         Set the boundary of the sandpile.
         """
-        assert boundary.shape == self.boundary.shape
+        assert boundary.shape == (self.rows, self.cols)
+        assert set(np.unique(boundary)) == {0, 1}
         self.boundary = boundary
-        self.is_trivial_boundary = False
+
+    def set_trivial_boundary(self) -> None:
+        """
+        Set the boundary of the sandpile to trivial.
+        """
+        self.boundary = np.zeros((self.rows, self.cols), dtype=np.int64)
+        self.boundary[:, 0 :: self.cols] = 1
+        self.boundary[0 :: self.rows, :] = 1
 
     def add_history(self, x: int, y: int, z: int) -> None:
         """
@@ -88,4 +97,29 @@ class Sandpile:
             "is_directed": self.is_directed,
             "grains": self.grains,
             "history": self.history.tolist(),
+            "is_trivial_boundary": self.is_trivial_boundary,
         }
+
+    @property
+    def is_trivial_boundary(self) -> bool:
+        """
+        Return True if the boundary is trivial.
+        """
+        if (
+            (self.boundary[:, 0 :: self.cols] == 1).all()
+            and (self.boundary[0 :: self.rows, :] == 1).all()
+            and (self.boundary[1 : self.rows - 1, 1 : self.cols - 1] == 0).all()
+        ):
+            return True
+        return False
+
+    @property
+    def shape(self):
+        return self.graph.shape
+
+    @property
+    def is_regular(self):
+        """
+        Return True if the sandpile is regular.
+        """
+        return True
