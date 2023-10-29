@@ -85,8 +85,8 @@ def save_data(sandpile: Sandpile, folder: str = "") -> tuple:
         )
 
     np.savetxt(
-        f"{dunes_path}/{folder}/history_{current}.csv",
-        sandpile.history,
+        f"{dunes_path}/{folder}/untoppled_{current}.csv",
+        sandpile.untoppled,
         delimiter=",",
         fmt="%i",
     )

@@ -9,12 +9,12 @@ class Sandpile:
     def __init__(self, rows, cols, tiling="square") -> None:
         assert tiling in ("triangular", "square", "hexagonal")
         self.graph = np.zeros((rows, cols), dtype=np.int64)
+        self.untoppled = np.zeros((rows, cols), dtype=np.int64)
         self.id = random.getrandbits(128)
         self.tiling = tiling
         self.rows = rows
         self.cols = cols
         self.is_directed = False
-        self.history = np.empty((0, 3))
 
         boundary = np.zeros((rows, cols), dtype=np.int64)
         boundary[:, 0::cols] = 1
@@ -29,8 +29,14 @@ class Sandpile:
         Add z grains of sand to the pile at (x, y).
         """
         if 0 < x < self.rows - 1 and 0 < y < self.cols - 1:
-            self.add_history(x, y, z)
+            self.add_untoppled(x, y, z)
             self.graph[x, y] += z
+
+    def add_everywhere(self, z: int) -> None:
+        """
+        Add z grains of sand everywhere.
+        """
+        self.graph += z
 
     def get(self, x: int, y: int) -> int:
         """
@@ -38,18 +44,12 @@ class Sandpile:
         """
         return self.graph[x, y]
 
-    def set(self, x: int, y: int, z: int) -> None:
-        """
-        Set the number of grains at (x, y) to z.
-        """
-        if 0 < x < self.rows - 1 and 0 < y < self.cols - 1:
-            self.graph[x, y] = z
-
     def set_graph(self, graph: np.ndarray) -> None:
         """
         Set the graph of the sandpile.
         """
         assert graph.shape == self.graph.shape
+        self.untoppled = graph
         self.graph = graph
 
     def get_graph(self):
@@ -71,11 +71,11 @@ class Sandpile:
         self.boundary[:, 0 :: self.cols] = 1
         self.boundary[0 :: self.rows, :] = 1
 
-    def add_history(self, x: int, y: int, z: int) -> None:
+    def add_untoppled(self, x: int, y: int, z: int) -> None:
         """
-        Add a step to the history of the sandpile.
+        Add z grains of sand to the untoppled pile at (x, y).
         """
-        self.history = np.append(self.history, np.array([[x, y, z]]), axis=0)
+        self.untoppled[x, y] += z
 
     @property
     def grains(self) -> int:
@@ -96,7 +96,6 @@ class Sandpile:
             "tiling": self.tiling,
             "is_directed": self.is_directed,
             "grains": self.grains,
-            "history": self.history.tolist(),
             "is_trivial_boundary": self.is_trivial_boundary,
         }
 

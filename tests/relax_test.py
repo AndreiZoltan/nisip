@@ -23,6 +23,9 @@ true_data = "true_data/"
 def get_test_list():
     files = os.listdir(f"{test_path}/{true_data}/")
     graphs = sorted([graph for graph in files if graph.startswith("graph_")])
+    untoppled_graphs = sorted(
+        [graph for graph in files if graph.startswith("untoppled_")]
+    )
     directed_graphs = sorted(
         [graph for graph in files if graph.startswith("directed_graph_")]
     )
@@ -44,11 +47,13 @@ def get_test_list():
         else ""
         for graph in graphs
     ]
-    return list(zip(graphs, metas, directed_graphs, boundary))
+    return list(zip(graphs, untoppled_graphs, metas, directed_graphs, boundary))
 
 
-@pytest.mark.parametrize("graph, meta, directed_graph, boundary", get_test_list())
-def relax_test(graph, meta, directed_graph, boundary):
+@pytest.mark.parametrize(
+    "graph, untoppled, meta, directed_graph, boundary", get_test_list()
+)
+def relax_test(graph, untoppled, meta, directed_graph, boundary):
     with open(f"{test_path}/{true_data}/{meta}") as f:
         meta = json.load(f)
     if meta["is_directed"]:
@@ -62,7 +67,12 @@ def relax_test(graph, meta, directed_graph, boundary):
         boundary = np.loadtxt(
             f"{test_path}/{true_data}/{boundary}", delimiter=",", dtype=np.int64
         )
-    sandpile = create_from_meta(meta, directed_graph=directed_graph, boundary=boundary)
+    untoppled = np.loadtxt(
+        f"{test_path}/{true_data}/{untoppled}", delimiter=",", dtype=np.int64
+    )
+    sandpile = create_from_meta(
+        meta, untoppled=untoppled, directed_graph=directed_graph, boundary=boundary
+    )
     graph = np.loadtxt(
         f"{test_path}/{true_data}/{graph}", delimiter=",", dtype=np.int64
     )

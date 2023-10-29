@@ -14,6 +14,7 @@ def degrees2nodes(degrees: np.ndarray) -> np.ndarray:
 
 def create_from_meta(
     meta: dict,
+    untoppled: np.ndarray = np.empty(0),
     directed_graph: np.ndarray = np.empty(0),
     boundary: np.ndarray = np.empty(0),
 ) -> Union[Sandpile, DirectedSandpile]:
@@ -30,9 +31,8 @@ def create_from_meta(
         sandpile = Sandpile(int(meta["rows"]), int(meta["cols"]), meta["tiling"])
     if not meta["is_trivial_boundary"]:
         sandpile.set_boundary(boundary)
-    for x, y, z in np.array(meta["history"], dtype=np.int64):
-        sandpile.add(x, y, z)
-        sandpile = relax(sandpile)
+    sandpile.set_graph(untoppled)
+    sandpile = relax(sandpile)
     return sandpile
 
 
