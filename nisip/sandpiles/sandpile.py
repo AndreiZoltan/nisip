@@ -1,12 +1,10 @@
-from nntplib import NNTPDataError
 import random
-import json
 
 import numpy as np
 
 
 class Sandpile:
-    def __init__(self, rows, cols, tiling="square") -> None:
+    def __init__(self, rows, cols, tiling="square") -> None: # TODO rows, cols -> shape
         assert tiling in ("triangular", "square", "hexagonal")
         self.graph = np.zeros((rows, cols), dtype=np.int64)
         self.untoppled = np.zeros((rows, cols), dtype=np.int64)
@@ -28,14 +26,14 @@ class Sandpile:
         """
         Add z grains of sand to the pile at (x, y).
         """
-        if 0 < x < self.rows - 1 and 0 < y < self.cols - 1:
-            self.add_untoppled(x, y, z)
-            self.graph[x, y] += z
+        self.untoppled[x, y] += z
+        self.graph[x, y] += z
 
     def add_everywhere(self, z: int) -> None:
         """
         Add z grains of sand everywhere.
         """
+        self.untoppled += z
         self.graph += z
 
     def get(self, x: int, y: int) -> int:
@@ -70,12 +68,6 @@ class Sandpile:
         self.boundary = np.zeros((self.rows, self.cols), dtype=np.int64)
         self.boundary[:, 0 :: self.cols] = 1
         self.boundary[0 :: self.rows, :] = 1
-
-    def add_untoppled(self, x: int, y: int, z: int) -> None:
-        """
-        Add z grains of sand to the untoppled pile at (x, y).
-        """
-        self.untoppled[x, y] += z
 
     @property
     def grains(self) -> int:
