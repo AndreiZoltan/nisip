@@ -4,23 +4,22 @@ import numpy as np
 
 
 class Sandpile:
-    def __init__(self, rows, cols, tiling="square") -> None: # TODO rows, cols -> shape
+    def __init__(self, shape, tiling="square") -> None:
         assert tiling in ("triangular", "square", "hexagonal")
+        rows, cols = shape
         self.graph = np.zeros((rows, cols), dtype=np.int64)
         self.untoppled = np.zeros((rows, cols), dtype=np.int64)
         self.id = random.getrandbits(128)
         self.tiling = tiling
-        self.rows = rows
-        self.cols = cols
         self.is_directed = False
 
         boundary = np.zeros((rows, cols), dtype=np.int64)
-        boundary[:, 0::cols] = 1
-        boundary[0::rows, :] = 1
+        boundary[:, ::cols] = 1
+        boundary[::rows, :] = 1
         self.set_boundary(boundary)
 
     def __repr__(self) -> str:
-        return f"Sandpile(rows={self.rows}, cols={self.cols}, tiling={self.tiling}, is_directed={self.is_directed}, grains={self.grains})"
+        return f"Sandpile(shape={self.shape}, tiling={self.tiling}, is_directed={self.is_directed}, grains={self.degree})"
 
     def add(self, x: int, y: int, z: int) -> None:
         """
@@ -57,7 +56,7 @@ class Sandpile:
         """
         Set the boundary of the sandpile.
         """
-        assert boundary.shape == (self.rows, self.cols)
+        assert boundary.shape == self.shape
         assert set(np.unique(boundary)) == {0, 1}
         self.boundary = boundary
 
@@ -65,12 +64,12 @@ class Sandpile:
         """
         Set the boundary of the sandpile to trivial.
         """
-        self.boundary = np.zeros((self.rows, self.cols), dtype=np.int64)
+        self.boundary = np.zeros(self.shape, dtype=np.int64)
         self.boundary[:, 0 :: self.cols] = 1
         self.boundary[0 :: self.rows, :] = 1
 
     @property
-    def grains(self) -> int:
+    def degree(self) -> int:
         """
         Return the total number of grains in the sandpile.
         """
@@ -83,11 +82,10 @@ class Sandpile:
         """
         return {
             "id": self.id,
-            "rows": self.rows,
-            "cols": self.cols,
+            "shape": self.shape,
             "tiling": self.tiling,
             "is_directed": self.is_directed,
-            "grains": self.grains,
+            "degree": self.degree,
             "is_trivial_boundary": self.is_trivial_boundary,
         }
 
@@ -107,6 +105,14 @@ class Sandpile:
     @property
     def shape(self):
         return self.graph.shape
+
+    @property
+    def rows(self):
+        return self.shape[0]
+
+    @property
+    def cols(self):
+        return self.shape[1]
 
     @property
     def is_regular(self):

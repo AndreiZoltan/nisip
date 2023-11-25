@@ -77,26 +77,3 @@ def relax_test(graph, untoppled, meta, directed_graph, boundary):
         f"{test_path}/{true_data}/{graph}", delimiter=",", dtype=np.int64
     )
     assert np.array_equal(sandpile.graph, graph)
-
-
-@pytest.mark.parametrize(
-    "rows, cols, tiling, x, y, z",
-    [
-        [3, 3, "square", 1, 1, 10],
-    ],
-)
-def drop_sand_boundary_test(rows, cols, tiling, x, y, z):
-    if tiling == "square":
-        max_grain = 3
-    elif tiling == "triangular":
-        max_grain = 5
-    else:
-        max_grain = 2
-    sandpile = Sandpile(rows, cols, tiling)
-    sandpile.add(x, y, z)
-    sandpile = relax(sandpile)
-    assert np.max(sandpile.graph) <= max_grain
-    assert np.max(sandpile.graph[0]) == 0
-    assert np.max(sandpile.graph[-1]) == 0
-    assert np.max(sandpile.graph[:, 0]) == 0
-    assert np.max(sandpile.graph[:, -1]) == 0

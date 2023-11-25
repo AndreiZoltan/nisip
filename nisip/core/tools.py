@@ -22,13 +22,11 @@ def create_from_meta(
     Create a sandpile from a metadata dictionary.
     """
     if meta["is_directed"] == True:
-        sandpile = DirectedSandpile(
-            int(meta["rows"]), int(meta["cols"]), meta["tiling"], meta["directions"]
-        )
+        sandpile = DirectedSandpile(meta["shape"], meta["tiling"], meta["directions"])
         if not meta["is_regular"]:
             sandpile.set_directed_graph(directed_graph)
     else:
-        sandpile = Sandpile(int(meta["rows"]), int(meta["cols"]), meta["tiling"])
+        sandpile = Sandpile(meta["shape"], meta["tiling"])
     if not meta["is_trivial_boundary"]:
         sandpile.set_boundary(boundary)
     sandpile.set_graph(untoppled)

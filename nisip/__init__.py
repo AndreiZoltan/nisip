@@ -19,3 +19,8 @@ from .core import (
     charge_graph,
     charge_graph_with_corridors,
 )
+from pathlib import Path
+
+NISIP_DIR = Path(__file__).parent
+PROJECT_DIR = NISIP_DIR.parent
+TESTS_DIR = PROJECT_DIR / "tests"

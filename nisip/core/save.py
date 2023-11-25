@@ -124,7 +124,7 @@ def update_sqlite(
                VALUES (?, ?, ?, ?, ?, ?)""",
         (
             folder,
-            sandpile.grains,
+            sandpile.degree,
             sandpile.rows,
             sandpile.cols,
             sandpile.tiling,

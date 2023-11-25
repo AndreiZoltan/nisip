@@ -15,13 +15,12 @@ def degrees2nodes(degrees: np.ndarray) -> np.ndarray:
 class DirectedSandpile(Sandpile):
     def __init__(
         self,
-        rows: int,
-        cols: int,
+        shape: tuple,
         tiling: str = "square",
         directions=(1, 1, -1),
         directed_graph: np.ndarray = np.empty(0),
     ) -> None:
-        super().__init__(rows, cols, tiling=tiling)
+        super().__init__(shape, tiling=tiling)
         self.is_directed = True
         self.directions = np.array(directions)
         if np.size(directed_graph):
