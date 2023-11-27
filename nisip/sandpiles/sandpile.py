@@ -2,24 +2,29 @@ import random
 
 import numpy as np
 
+import cnisip as cns
+
 
 class Sandpile:
     def __init__(self, shape, tiling="square") -> None:
         assert tiling in ("triangular", "square", "hexagonal")
         rows, cols = shape
-        self.graph = np.zeros((rows, cols), dtype=np.int64)
-        self.untoppled = np.zeros((rows, cols), dtype=np.int64)
+        self.graph = np.zeros(shape, dtype=np.int64)
+        self.untoppled = np.zeros(shape, dtype=np.int64)
         self.id = random.getrandbits(128)
         self.tiling = tiling
-        self.is_directed = False
 
-        boundary = np.zeros((rows, cols), dtype=np.int64)
+        boundary = np.zeros(shape, dtype=np.int64)
         boundary[:, ::cols] = 1
         boundary[::rows, :] = 1
         self.set_boundary(boundary)
 
+        self.set_undirected_graph()
+
+        self.directions = None
+
     def __repr__(self) -> str:
-        return f"Sandpile(shape={self.shape}, tiling={self.tiling}, is_directed={self.is_directed}, grains={self.degree})"
+        return f"Meta: {self.meta}"
 
     def add(self, x: int, y: int, z: int) -> None:
         """
@@ -51,6 +56,42 @@ class Sandpile:
 
     def get_graph(self):
         return self.graph.astype(np.int64)
+
+    def degrees2nodes(self, degrees: np.ndarray) -> np.ndarray:
+        return np.vectorize(
+            lambda x: np.unpackbits(np.array([x], dtype="uint8")).sum()
+        )(degrees)
+
+    def set_directed_graph(self, directed_graph: np.ndarray) -> None:
+        """
+        Set the directed graph of the sandpile.
+        """
+        assert directed_graph.shape == self.shape
+        self.directed_graph = directed_graph
+        self.nodes_degrees = self.degrees2nodes(directed_graph)
+        self.directions = None
+
+    def undirected_graph(self):
+        directed_graph = np.full(self.shape, 0b111111)
+        directed_graph[0] &= 0b010111
+        directed_graph[-1] &= 0b101011
+        directed_graph[:, 0] &= 0b011101
+        directed_graph[:, -1] &= 0b101110
+        return directed_graph
+
+    def set_undirected_graph(self):
+        self.set_directed_graph(self.undirected_graph())
+
+    def set_regular_graph(self, directions: tuple) -> None:
+        assert len(directions) == 3
+        self.directions = np.array(directions)
+        # TODO set directed graph normally
+        self.directed_graph *= 0
+
+    def set_random_graph(self):
+        if self.tiling == "triangular":
+            random_triangular_graph = cns.random_triangular_graph(self.rows, self.cols)
+            self.set_directed_graph(random_triangular_graph)
 
     def set_boundary(self, boundary: np.ndarray) -> None:
         """
@@ -87,6 +128,10 @@ class Sandpile:
             "is_directed": self.is_directed,
             "degree": self.degree,
             "is_trivial_boundary": self.is_trivial_boundary,
+            "is_regular": self.is_regular,
+            "directions": self.directions.tolist()
+            if self.directions is not None
+            else None,
         }
 
     @property
@@ -115,8 +160,9 @@ class Sandpile:
         return self.shape[1]
 
     @property
+    def is_directed(self):
+        return not (self.directed_graph == self.undirected_graph()).all()
+
+    @property
     def is_regular(self):
-        """
-        Return True if the sandpile is regular.
-        """
-        return True
+        return self.directions is not None

@@ -1,6 +1,5 @@
 __all__ = [
     "Sandpile",
-    "DirectedSandpile",
     "relax",
     "save",
     "add",
@@ -9,7 +8,7 @@ __all__ = [
     "charge_graph",
     "charge_graph_with_corridors",
 ]
-from .sandpiles import Sandpile, DirectedSandpile
+from .sandpiles import Sandpile
 from .core import (
     relax,
     save,

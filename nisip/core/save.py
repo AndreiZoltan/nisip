@@ -11,7 +11,7 @@ dunes_path = f"{nisip_path}/dunes/"
 
 import numpy as np
 
-from nisip.sandpiles import Sandpile, DirectedSandpile
+from nisip.sandpiles import Sandpile
 from nisip.visualization.hex_heatmap_vector import hex_heatmap_vec
 from nisip.visualization.hex_heatmap_raster import hex_heatmap_raster
 
@@ -62,7 +62,6 @@ def save_data(sandpile: Sandpile, folder: str = "") -> tuple:
     graph_path = f"{dunes_path}/{folder}/graph_{current}.csv"
     np.savetxt(graph_path, sandpile.graph, delimiter=",", fmt="%i")
     if sandpile.is_directed:
-        assert isinstance(sandpile, DirectedSandpile)
         if not sandpile.is_regular:
             np.savetxt(
                 f"{dunes_path}/{folder}/directed_graph_{current}.csv",

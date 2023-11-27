@@ -1,8 +1,6 @@
-from typing import Union
-
 import numpy as np
 
-from nisip.sandpiles import Sandpile, DirectedSandpile
+from nisip.sandpiles import Sandpile
 from nisip.core.relax import relax
 
 
@@ -17,12 +15,13 @@ def create_from_meta(
     untoppled: np.ndarray = np.empty(0),
     directed_graph: np.ndarray = np.empty(0),
     boundary: np.ndarray = np.empty(0),
-) -> Union[Sandpile, DirectedSandpile]:
+) -> Sandpile:
     """
     Create a sandpile from a metadata dictionary.
     """
     if meta["is_directed"] == True:
-        sandpile = DirectedSandpile(meta["shape"], meta["tiling"], meta["directions"])
+        sandpile = Sandpile(meta["shape"], meta["tiling"])
+        sandpile.set_regular_graph(meta["directions"])
         if not meta["is_regular"]:
             sandpile.set_directed_graph(directed_graph)
     else:
@@ -30,7 +29,10 @@ def create_from_meta(
     if not meta["is_trivial_boundary"]:
         sandpile.set_boundary(boundary)
     sandpile.set_graph(untoppled)
+    # print(sandpile.get_graph())
+    # print(sandpile.meta)
     sandpile = relax(sandpile)
+    # print(sandpile.get_graph())
     return sandpile
 
 

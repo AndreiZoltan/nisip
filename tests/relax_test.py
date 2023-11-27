@@ -18,6 +18,7 @@ from sandpiles import Sandpile  # type: ignore
 from core import relax, create_from_meta  # type: ignore
 
 true_data = "true_data/"
+# true_data = "isolate/"
 
 
 def get_test_list():
