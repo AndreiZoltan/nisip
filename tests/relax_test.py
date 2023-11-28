@@ -19,7 +19,6 @@ from core import relax, create_from_meta  # type: ignore
 
 true_data = "true_data/"
 # true_data = "isolate/"
-true_data = "true_data_regular/"
 
 
 def get_test_list():
