@@ -1,8 +1,4 @@
-import random
-
 import numpy as np
-
-import cnisip as cns
 
 
 class Sandpile:
@@ -11,12 +7,11 @@ class Sandpile:
         rows, cols = shape
         self.graph = np.zeros(shape, dtype=np.int64)
         self.untoppled = np.zeros(shape, dtype=np.int64)
-        self.id = random.getrandbits(128)
         self.tiling = tiling
 
         boundary = np.zeros(shape, dtype=np.int64)
+        boundary[::rows] = 1
         boundary[:, ::cols] = 1
-        boundary[::rows, :] = 1
         self.set_boundary(boundary)
 
         self.set_undirected_graph()
@@ -69,7 +64,7 @@ class Sandpile:
         assert directed_graph.shape == self.shape
         self.directed_graph = directed_graph
         self.nodes_degrees = self.degrees2nodes(directed_graph)
-        self.directions = None
+        self.untoppled = self.graph
 
     def undirected_graph(self):
         directed_graph = np.full(self.shape, 0b111111)
@@ -79,19 +74,8 @@ class Sandpile:
         directed_graph[:, -1] &= 0b101110
         return directed_graph
 
-    def set_undirected_graph(self):
+    def set_undirected_graph(self) -> None:
         self.set_directed_graph(self.undirected_graph())
-
-    def set_regular_graph(self, directions: tuple) -> None:
-        assert len(directions) == 3
-        self.directions = np.array(directions)
-        # TODO set directed graph normally
-        self.directed_graph *= 0
-
-    def set_random_graph(self):
-        if self.tiling == "triangular":
-            random_triangular_graph = cns.random_triangular_graph(self.rows, self.cols)
-            self.set_directed_graph(random_triangular_graph)
 
     def set_boundary(self, boundary: np.ndarray) -> None:
         """
@@ -117,21 +101,16 @@ class Sandpile:
         return int(np.sum(self.graph))
 
     @property
-    def meta(self):
+    def meta(self):  # TODO get rid of auxilary methods
         """
         Return the metadata of the sandpile.
         """
         return {
-            "id": self.id,
             "shape": self.shape,
             "tiling": self.tiling,
             "is_directed": self.is_directed,
             "degree": self.degree,
             "is_trivial_boundary": self.is_trivial_boundary,
-            "is_regular": self.is_regular,
-            "directions": self.directions.tolist()
-            if self.directions is not None
-            else None,
         }
 
     @property

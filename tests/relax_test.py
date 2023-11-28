@@ -19,6 +19,7 @@ from core import relax, create_from_meta  # type: ignore
 
 true_data = "true_data/"
 # true_data = "isolate/"
+true_data = "true_data_regular/"
 
 
 def get_test_list():
@@ -40,12 +41,13 @@ def get_test_list():
     metas_id = [meta.replace(".json", "") for meta in metas_id]
     assert set(graphs_id) == set(metas_id)
     directed_graphs = [
-        f"directed_{graph}" if f"directed_{graph}" in files else "" for graph in graphs
+        f"directed_{graph}" if f"directed_{graph}" in files else None
+        for graph in graphs
     ]
     boundary = [
         f"boundary_{'_'.join(graph.split('_')[1:])}"
         if f"boundary_{'_'.join(graph.split('_')[1:])}" in files
-        else ""
+        else None
         for graph in graphs
     ]
     return list(zip(graphs, untoppled_graphs, metas, directed_graphs, boundary))
@@ -57,14 +59,13 @@ def get_test_list():
 def relax_test(graph, untoppled, meta, directed_graph, boundary):
     with open(f"{test_path}/{true_data}/{meta}") as f:
         meta = json.load(f)
-    if meta["is_directed"]:
-        if not meta["is_regular"]:
-            directed_graph = np.loadtxt(
-                f"{test_path}/{true_data}/{directed_graph}",
-                delimiter=",",
-                dtype=np.int64,
-            )
-    if not meta["is_trivial_boundary"]:
+    if directed_graph is not None:
+        directed_graph = np.loadtxt(
+            f"{test_path}/{true_data}/{directed_graph}",
+            delimiter=",",
+            dtype=np.int64,
+        )
+    if boundary is not None:
         boundary = np.loadtxt(
             f"{test_path}/{true_data}/{boundary}", delimiter=",", dtype=np.int64
         )
@@ -77,4 +78,5 @@ def relax_test(graph, untoppled, meta, directed_graph, boundary):
     graph = np.loadtxt(
         f"{test_path}/{true_data}/{graph}", delimiter=",", dtype=np.int64
     )
-    assert np.array_equal(sandpile.graph, graph)
+    sandpile = relax(sandpile)
+    assert np.array_equal(sandpile.get_graph(), graph)
