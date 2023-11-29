@@ -8,6 +8,7 @@ __all__ = [
     "charge_graph",
     "charge_graph_with_corridors",
     "regular_graph",
+    "random_graph",
 ]
 from .sandpiles import (
     Sandpile,
@@ -15,6 +16,7 @@ from .sandpiles import (
     charge_graph,
     charge_graph_with_corridors,
     regular_graph,
+    random_graph,
 )
 from .core import relax, save, add, create_from_meta
 from pathlib import Path

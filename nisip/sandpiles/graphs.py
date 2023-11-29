@@ -1,7 +1,5 @@
 import numpy as np
 
-import cnisip as cns
-
 
 def degrees2nodes(degrees: np.ndarray) -> np.ndarray:
     return np.vectorize(lambda x: np.unpackbits(np.array([x], dtype="uint8")).sum())(
@@ -101,5 +99,5 @@ def regular_graph(directions: tuple, shape: tuple) -> np.ndarray:
     return graph
 
 
-def set_random_graph(shape):
-    return cns.random_triangular_graph(shape)
+def random_graph(shape):
+    return np.random.choice(1 << 6 - 1, size=shape)

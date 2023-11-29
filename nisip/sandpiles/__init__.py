@@ -4,4 +4,5 @@ from .graphs import (
     charge_graph,
     charge_graph_with_corridors,
     regular_graph,
+    random_graph,
 )

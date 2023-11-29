@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Sandpile:
-    def __init__(self, shape, tiling="square") -> None:
+    def __init__(self, shape, tiling="triangular") -> None:
         assert tiling in ("triangular", "square", "hexagonal")
         rows, cols = shape
         self.graph = np.zeros(shape, dtype=np.int64)  # TODO graph -> configuration
@@ -10,8 +10,6 @@ class Sandpile:
         self.tiling = tiling
 
         boundary = np.zeros(shape, dtype=np.int64)
-        boundary[::rows] = 1
-        boundary[:, ::cols] = 1
         self.set_boundary(boundary)
 
         self.set_undirected_graph()
@@ -82,24 +80,16 @@ class Sandpile:
         Set the boundary of the sandpile.
         """
         assert boundary.shape == self.shape
-        assert set(np.unique(boundary)) == {0, 1}
+        assert set(np.unique(boundary)) <= {0, 1}
+        boundary[0 :: self.rows - 1] = 1
+        boundary[:, 0 :: self.cols - 1] = 1
         self.boundary = boundary
-
-    def set_trivial_boundary(self) -> None:
-        """
-        Set the boundary of the sandpile to trivial.
-        """
-        self.boundary = np.zeros(self.shape, dtype=np.int64)
-        self.boundary[:, 0 :: self.cols] = 1
-        self.boundary[0 :: self.rows] = 1
 
     @property
     def max_recurrent(self):
         max_recurent = self.nodes_degrees - 1
         max_recurent = max_recurent & self.boundary
         return max_recurent
-
-
 
     @property
     def degree(self) -> int:
@@ -127,8 +117,8 @@ class Sandpile:
         Return True if the boundary is trivial.
         """
         if (
-            (self.boundary[:, 0 :: self.cols] == 1).all()
-            and (self.boundary[0 :: self.rows, :] == 1).all()
+            (self.boundary[:: self.rows - 1] == 1).all()
+            and (self.boundary[:, :: self.cols - 1] == 1).all()
             and (self.boundary[1 : self.rows - 1, 1 : self.cols - 1] == 0).all()
         ):
             return True
