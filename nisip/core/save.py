@@ -61,20 +61,18 @@ def save_data(sandpile: Sandpile, folder: str = "") -> tuple:
     os.makedirs(f"{dunes_path}/{folder}", exist_ok=True)
     graph_path = f"{dunes_path}/{folder}/graph_{current}.csv"
     np.savetxt(graph_path, sandpile.graph, delimiter=",", fmt="%i")
-    if sandpile.is_directed:
-        if not sandpile.is_regular:
-            np.savetxt(
-                f"{dunes_path}/{folder}/directed_graph_{current}.csv",
-                sandpile.directed_graph,
-                delimiter=",",
-                fmt="%i",
-            )
-            np.savetxt(
-                f"{dunes_path}/{folder}/nodes_degrees_{current}.csv",
-                sandpile.nodes_degrees,
-                delimiter=",",
-                fmt="%i",
-            )
+    np.savetxt(
+        f"{dunes_path}/{folder}/directed_graph_{current}.csv",
+        sandpile.directed_graph,
+        delimiter=",",
+        fmt="%i",
+    )
+    # np.savetxt(
+    #     f"{dunes_path}/{folder}/nodes_degrees_{current}.csv",
+    #     sandpile.nodes_degrees,
+    #     delimiter=",",
+    #     fmt="%i",
+    # )
     if not sandpile.is_trivial_boundary:
         np.savetxt(
             f"{dunes_path}/{folder}/boundary_{current}.csv",

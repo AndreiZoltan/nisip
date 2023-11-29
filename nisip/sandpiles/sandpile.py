@@ -5,7 +5,7 @@ class Sandpile:
     def __init__(self, shape, tiling="square") -> None:
         assert tiling in ("triangular", "square", "hexagonal")
         rows, cols = shape
-        self.graph = np.zeros(shape, dtype=np.int64)
+        self.graph = np.zeros(shape, dtype=np.int64)  # TODO graph -> configuration
         self.untoppled = np.zeros(shape, dtype=np.int64)
         self.tiling = tiling
 
@@ -91,7 +91,15 @@ class Sandpile:
         """
         self.boundary = np.zeros(self.shape, dtype=np.int64)
         self.boundary[:, 0 :: self.cols] = 1
-        self.boundary[0 :: self.rows, :] = 1
+        self.boundary[0 :: self.rows] = 1
+
+    @property
+    def max_recurrent(self):
+        max_recurent = self.nodes_degrees - 1
+        max_recurent = max_recurent & self.boundary
+        return max_recurent
+
+
 
     @property
     def degree(self) -> int:
