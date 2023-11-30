@@ -53,7 +53,7 @@ class Sandpile:
     def degrees2nodes(self, degrees: np.ndarray) -> np.ndarray:
         return np.vectorize(
             lambda x: np.unpackbits(np.array([x], dtype="uint8")).sum()
-        )(degrees)
+        )(degrees).astype(np.int64)
 
     def set_directed_graph(self, directed_graph: np.ndarray) -> None:
         """
