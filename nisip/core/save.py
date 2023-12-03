@@ -60,10 +60,10 @@ def save_data(sandpile: Sandpile, folder: str = "") -> tuple:
         folder = current
     os.makedirs(f"{dunes_path}/{folder}", exist_ok=True)
     graph_path = f"{dunes_path}/{folder}/graph_{current}.csv"
-    np.savetxt(graph_path, sandpile.graph, delimiter=",", fmt="%i")
+    np.savetxt(graph_path, sandpile.configuration, delimiter=",", fmt="%i")
     np.savetxt(
         f"{dunes_path}/{folder}/directed_graph_{current}.csv",
-        sandpile.directed_graph,
+        sandpile.graph,
         delimiter=",",
         fmt="%i",
     )
@@ -138,9 +138,9 @@ def save(sandpile: Sandpile, folder: str = "", imsave=True) -> None:
     # if directory nisip_path/dunes does not exist, create it
     assert ncolors(sandpile.tiling) == 6
     con, cur = init_sqlite()
-    graph_path, folder, current = save_data(sandpile, folder)
+    configuration_path, folder, current = save_data(sandpile, folder)
     if imsave:
-        save_image(graph_path, folder, current)
+        save_image(configuration_path, folder, current)
     update_sqlite(sandpile, folder, con, cur)
 
     # print("The image and history were saved in the directory nisip/dunes.")

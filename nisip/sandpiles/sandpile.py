@@ -4,8 +4,9 @@ import numpy as np
 class Sandpile:
     def __init__(self, shape, tiling="triangular") -> None:
         assert tiling in ("triangular", "square", "hexagonal")
-        rows, cols = shape
-        self.graph = np.zeros(shape, dtype=np.int64)  # TODO graph -> configuration
+        self.configuration = np.zeros(
+            shape, dtype=np.int64
+        )  # TODO graph -> configuration
         self.untoppled = np.zeros(shape, dtype=np.int64)
         self.tiling = tiling
 
@@ -24,56 +25,56 @@ class Sandpile:
         Add z grains of sand to the pile at (x, y).
         """
         self.untoppled[x, y] += z
-        self.graph[x, y] += z
+        self.configuration[x, y] += z
 
     def add_everywhere(self, z: int) -> None:
         """
         Add z grains of sand everywhere.
         """
         self.untoppled += z
-        self.graph += z
+        self.configuration += z
 
     def get(self, x: int, y: int) -> int:
         """
         Return the number of grains at (x, y).
         """
-        return self.graph[x, y]
+        return self.configuration[x, y]
 
-    def set_graph(self, graph: np.ndarray) -> None:
+    def set_configuration(self, configuration: np.ndarray) -> None:
         """
-        Set the graph of the sandpile.
+        Set the configuration of the sandpile.
         """
-        assert graph.shape == self.graph.shape
-        self.untoppled = graph
-        self.graph = graph
+        assert configuration.shape == self.configuration.shape
+        self.untoppled = configuration
+        self.configuration = configuration
 
-    def get_graph(self):
-        return self.graph.astype(np.int64)
+    def get_configuration(self):
+        return self.configuration.astype(np.int64)
 
     def degrees2nodes(self, degrees: np.ndarray) -> np.ndarray:
         return np.vectorize(
             lambda x: np.unpackbits(np.array([x], dtype="uint8")).sum()
         )(degrees).astype(np.int64)
 
-    def set_directed_graph(self, directed_graph: np.ndarray) -> None:
+    def set_graph(self, graph: np.ndarray) -> None:
         """
         Set the directed graph of the sandpile.
         """
-        assert directed_graph.shape == self.shape
-        self.directed_graph = directed_graph
-        self.nodes_degrees = self.degrees2nodes(directed_graph)
-        self.untoppled = self.graph
+        assert graph.shape == self.shape
+        self.graph = graph
+        self.nodes_degrees = self.degrees2nodes(graph)
+        self.untoppled[:] = self.configuration
 
     def undirected_graph(self):
-        directed_graph = np.full(self.shape, 0b111111)
-        directed_graph[0] &= 0b010111
-        directed_graph[-1] &= 0b101011
-        directed_graph[:, 0] &= 0b011101
-        directed_graph[:, -1] &= 0b101110
-        return directed_graph
+        graph = np.full(self.shape, 0b111111)
+        graph[0] &= 0b010111
+        graph[-1] &= 0b101011
+        graph[:, 0] &= 0b011101
+        graph[:, -1] &= 0b101110
+        return graph
 
     def set_undirected_graph(self) -> None:
-        self.set_directed_graph(self.undirected_graph())
+        self.set_graph(self.undirected_graph())
 
     def set_boundary(self, boundary: np.ndarray) -> None:
         """
@@ -88,7 +89,7 @@ class Sandpile:
     @property
     def max_recurrent(self):
         max_recurent = self.nodes_degrees - 1
-        max_recurent = max_recurent & self.boundary
+        max_recurent[self.boundary == 1] = 0
         return max_recurent
 
     @property
@@ -96,7 +97,7 @@ class Sandpile:
         """
         Return the total number of grains in the sandpile.
         """
-        return int(np.sum(self.graph))
+        return int(np.sum(self.configuration))
 
     @property
     def meta(self):  # TODO get rid of auxilary methods
@@ -126,7 +127,7 @@ class Sandpile:
 
     @property
     def shape(self):
-        return self.graph.shape
+        return self.configuration.shape
 
     @property
     def rows(self):
@@ -138,7 +139,7 @@ class Sandpile:
 
     @property
     def is_directed(self):
-        return not (self.directed_graph == self.undirected_graph()).all()
+        return not (self.graph == self.undirected_graph()).all()
 
     @property
     def is_regular(self):

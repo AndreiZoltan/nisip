@@ -9,6 +9,7 @@ __all__ = [
     "charge_graph_with_corridors",
     "regular_graph",
     "random_graph",
+    "identity",
 ]
 from .sandpiles import (
     Sandpile,
@@ -18,7 +19,7 @@ from .sandpiles import (
     regular_graph,
     random_graph,
 )
-from .core import relax, save, add, create_from_meta
+from .core import relax, save, add, create_from_meta, identity
 from pathlib import Path
 
 NISIP_DIR = Path(__file__).parent

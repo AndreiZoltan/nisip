@@ -11,5 +11,5 @@ def imshow(sandpile: Sandpile) -> None:
     import matplotlib.pyplot as plt  # TODO : move this import to the top of the file
 
     if sandpile.tiling == "square":
-        plt.imshow(sandpile.graph, cmap="hot", interpolation="nearest")
+        plt.imshow(sandpile.configuration, cmap="hot", interpolation="nearest")
         plt.show()

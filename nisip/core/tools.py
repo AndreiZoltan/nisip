@@ -14,8 +14,8 @@ def create_from_meta(
     """
     sandpile = Sandpile(meta["shape"], meta["tiling"])
     if directed_graph is not None:
-        sandpile.set_directed_graph(directed_graph)
+        sandpile.set_graph(directed_graph)
     if boundary is not None:
         sandpile.set_boundary(boundary)
-    sandpile.set_graph(untoppled)
+    sandpile.set_configuration(untoppled)
     return sandpile
