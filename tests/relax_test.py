@@ -23,7 +23,7 @@ true_data = "true_data/"
 
 def get_test_list():
     files = os.listdir(f"{test_path}/{true_data}/")
-    relaxed = sorted([graph for graph in files if graph.startswith("graph_")])
+    relaxed = sorted([graph for graph in files if graph.startswith("relaxed_")])
     untoppled = sorted(
         [
             configuration
@@ -31,25 +31,27 @@ def get_test_list():
             if configuration.startswith("untoppled_")
         ]
     )
-    graphs = sorted([graph for graph in files if graph.startswith("directed_graph_")])
+    graphs = sorted([graph for graph in files if graph.startswith("graph_")])
     boundary = sorted(
         [boundary for boundary in files if boundary.startswith("boundary_")]
     )
     metas = sorted([meta for meta in files if meta.startswith("meta_")])
-    graphs_id = [graph.replace("graph_", "") for graph in relaxed]
-    graphs_id = [graph.replace(".csv", "") for graph in graphs_id]
+    relaxed_id = [graph.replace("relaxed_", "") for graph in relaxed]
+    relaxed_id = [graph.replace(".csv", "") for graph in relaxed_id]
     metas_id = [meta.replace("meta_", "") for meta in metas]
     metas_id = [meta.replace(".json", "") for meta in metas_id]
-    assert set(graphs_id) == set(metas_id)
+    assert set(relaxed_id) == set(metas_id)
     graphs = [
-        f"directed_{graph}" if f"directed_{graph}" in files else None
+        graph.replace("relaxed", "graph")
+        if graph.replace("relaxed", "graph") in files
+        else None
         for graph in relaxed
     ]
     boundary = [
-        f"boundary_{'_'.join(graph.split('_')[1:])}"
-        if f"boundary_{'_'.join(graph.split('_')[1:])}" in files
+        boundary.replace("relaxed", "boundary")
+        if boundary.replace("relaxed", "boundary") in files
         else None
-        for graph in relaxed
+        for boundary in relaxed
     ]
     return list(zip(relaxed, untoppled, metas, graphs, boundary))
 
