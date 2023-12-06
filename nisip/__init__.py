@@ -10,6 +10,7 @@ __all__ = [
     "regular_graph",
     "random_graph",
     "identity",
+    "hexagon_boundary",
 ]
 from .sandpiles import (
     Sandpile,
@@ -18,6 +19,7 @@ from .sandpiles import (
     charge_graph_with_corridors,
     regular_graph,
     random_graph,
+    hexagon_boundary,
 )
 from .core import relax, save, add, create_from_meta, identity
 from pathlib import Path

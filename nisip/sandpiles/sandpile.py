@@ -1,12 +1,11 @@
+from copy import deepcopy
 import numpy as np
 
 
 class Sandpile:
     def __init__(self, shape, tiling="triangular") -> None:
         assert tiling in ("triangular", "square", "hexagonal")
-        self.configuration = np.zeros(
-            shape, dtype=np.int64
-        )  # TODO graph -> configuration
+        self.configuration = np.zeros(shape, dtype=np.int64)
         self.untoppled = np.zeros(shape, dtype=np.int64)
         self.tiling = tiling
 
@@ -20,19 +19,46 @@ class Sandpile:
     def __repr__(self) -> str:
         return f"Meta: {self.meta}"
 
+    def __eq__(self, other):
+        assert isinstance(other, Sandpile)
+        assert self.shape == other.shape, f"{self.shape} != {other.shape}"
+        assert self.tiling == other.tiling, f"{self.tiling} != {other.tiling}"
+        assert (self.graph == other.graph).all(), f"{self.graph} != {other.graph}"
+        assert (
+            self.boundary == other.boundary
+        ).all(), f"{self.boundary} != {other.boundary}"
+        return (self.configuration == other.configuration).all()
+
+    def __add__(self, other):
+        assert isinstance(other, Sandpile)
+        assert self.shape == other.shape
+        assert self.tiling == other.tiling
+        assert (self.graph == other.graph).all()
+        assert (self.boundary == other.boundary).all()
+        self.add_configuration(other.configuration)
+        return self
+
+    def __mul__(self, multiplier):
+        assert isinstance(multiplier, int)
+        assert multiplier >= 0
+        new_instance = deepcopy(self)
+        new_instance.set_configuration(self.configuration * multiplier)
+        return new_instance
+
     def add(self, x: int, y: int, z: int) -> None:
         """
         Add z grains of sand to the pile at (x, y).
         """
-        self.untoppled[x, y] += z
-        self.configuration[x, y] += z
+        if self.boundary[x, y] == 0:
+            self.untoppled[x, y] += z
+            self.configuration[x, y] += z
 
     def add_everywhere(self, z: int) -> None:
         """
         Add z grains of sand everywhere.
         """
-        self.untoppled += z
-        self.configuration += z
+        self.untoppled[self.boundary == 0] += z
+        self.configuration[self.boundary == 0] += z
 
     def get(self, x: int, y: int) -> int:
         """
@@ -40,12 +66,20 @@ class Sandpile:
         """
         return self.configuration[x, y]
 
+    def add_configuration(self, configuration: np.ndarray) -> None:
+        """
+        Add configuration to the sandpile.
+        """
+        assert configuration.shape == self.configuration.shape
+        self.untoppled += configuration
+        self.configuration += configuration
+
     def set_configuration(self, configuration: np.ndarray) -> None:
         """
         Set the configuration of the sandpile.
         """
         assert configuration.shape == self.configuration.shape
-        self.untoppled = configuration
+        self.untoppled = configuration  # TODO add boundary condition
         self.configuration = configuration
 
     def get_configuration(self):
