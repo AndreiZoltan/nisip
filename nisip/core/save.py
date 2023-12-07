@@ -59,10 +59,10 @@ def save_data(sandpile: Sandpile, folder: str = "") -> tuple:
     if not folder:
         folder = current
     os.makedirs(f"{dunes_path}/{folder}", exist_ok=True)
-    graph_path = f"{dunes_path}/{folder}/graph_{current}.csv"
-    np.savetxt(graph_path, sandpile.configuration, delimiter=",", fmt="%i")
+    configuration_path = f"{dunes_path}/{folder}/configuration_{current}.csv"
+    np.savetxt(configuration_path, sandpile.configuration, delimiter=",", fmt="%i")
     np.savetxt(
-        f"{dunes_path}/{folder}/directed_graph_{current}.csv",
+        f"{dunes_path}/{folder}/graph_{current}.csv",
         sandpile.graph,
         delimiter=",",
         fmt="%i",
@@ -89,7 +89,7 @@ def save_data(sandpile: Sandpile, folder: str = "") -> tuple:
     )
     with open(f"{dunes_path}/{folder}/meta_{current}.json", "w") as f:
         json.dump(sandpile.meta, f)
-    return graph_path, folder, current
+    return configuration_path, folder, current
 
 
 def save_image(graph_path: str, folder: str = "", current: str = ""):

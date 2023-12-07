@@ -11,6 +11,7 @@ __all__ = [
     "random_graph",
     "identity",
     "hexagon_boundary",
+    "adjacency_matrix",
 ]
 from .sandpiles import (
     Sandpile,
@@ -21,9 +22,14 @@ from .sandpiles import (
     random_graph,
     hexagon_boundary,
 )
-from .core import relax, save, add, create_from_meta, identity
+from .core import relax, save, add, create_from_meta, identity, adjacency_matrix
 from pathlib import Path
 
 NISIP_DIR = Path(__file__).parent
 PROJECT_DIR = NISIP_DIR.parent
 TESTS_DIR = PROJECT_DIR / "tests"
+
+SQUARE = 4
+TRIANGULAR = 3
+HEXAGONAL = 6
+TILINGS = [SQUARE, TRIANGULAR, HEXAGONAL]

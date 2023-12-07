@@ -68,7 +68,7 @@ cols <- dim(heatmap_matrix)[2]
 # png(output_path, width = cols * 140, height = rows * 90, res = 100)
 input_height <- rows
 input_width <- 3*cols/2
-k = 3000
+k = 6000
 if (input_height > input_width) {
   png(output_path, width = input_width*k/input_height, height = k, res = 100)
 } else {

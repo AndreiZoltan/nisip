@@ -8,8 +8,6 @@ def hexagon_boundary(x: int, y: int, diameter: int, shape: tuple) -> np.ndarray:
     assert len(shape) == 2
     boundary = np.zeros(shape, dtype=np.int64)
     grid = np.indices(shape)
-    x, y = shape[0] // 2, shape[1] // 2
-    diameter = min(shape) // 2 - 1
     boundary[: x - diameter] = 1
     boundary[x + diameter + 1 :] = 1
     boundary[:, : y - diameter] = 1

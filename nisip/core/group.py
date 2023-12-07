@@ -5,7 +5,7 @@ import numpy as np
 import nisip as ns
 
 
-def identity(sandpile: ns.Sandpile, check: bool = False) -> np.ndarray:
+def identity(sandpile: ns.Sandpile, check: bool = True) -> np.ndarray:
     sandpile = deepcopy(sandpile)
     max_recurent = sandpile.max_recurrent
     sandpile.set_configuration(2 * max_recurent)

@@ -7,6 +7,8 @@ class Sandpile:
         assert tiling in ("triangular", "square", "hexagonal")
         self.configuration = np.zeros(shape, dtype=np.int64)
         self.untoppled = np.zeros(shape, dtype=np.int64)
+        self.boundary = np.zeros(shape, dtype=np.int64)
+        self.graph = np.zeros(shape, dtype=np.int64)
         self.tiling = tiling
 
         boundary = np.zeros(shape, dtype=np.int64)
@@ -79,8 +81,8 @@ class Sandpile:
         Set the configuration of the sandpile.
         """
         assert configuration.shape == self.configuration.shape
-        self.untoppled = configuration  # TODO add boundary condition
-        self.configuration = configuration
+        self.untoppled[:] = configuration  # TODO add boundary condition
+        self.configuration[:] = configuration
 
     def get_configuration(self):
         return self.configuration.astype(np.int64)
@@ -95,7 +97,7 @@ class Sandpile:
         Set the directed graph of the sandpile.
         """
         assert graph.shape == self.shape
-        self.graph = graph
+        self.graph[:] = graph
         self.nodes_degrees = self.degrees2nodes(graph)
         self.untoppled[:] = self.configuration
 
@@ -118,7 +120,7 @@ class Sandpile:
         assert set(np.unique(boundary)) <= {0, 1}
         boundary[0 :: self.rows - 1] = 1
         boundary[:, 0 :: self.cols - 1] = 1
-        self.boundary = boundary
+        self.boundary[:] = boundary
 
     @property
     def max_recurrent(self):
