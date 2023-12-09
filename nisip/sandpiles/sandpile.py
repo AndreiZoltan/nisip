@@ -3,7 +3,7 @@ import numpy as np
 
 
 class Sandpile:
-    def __init__(self, shape, tiling="triangular") -> None:
+    def __init__(self, shape: tuple, tiling: str="triangular") -> None: # TODO tiling str -> int
         assert tiling in ("triangular", "square", "hexagonal")
         self.configuration = np.zeros(shape, dtype=np.int64)
         self.untoppled = np.zeros(shape, dtype=np.int64)
@@ -81,14 +81,14 @@ class Sandpile:
         Set the configuration of the sandpile.
         """
         assert configuration.shape == self.configuration.shape
-        self.untoppled[:] = configuration  # TODO add boundary condition
-        self.configuration[:] = configuration
+        self.untoppled[:] = configuration.astype(np.int64)  # TODO add boundary condition
+        self.configuration[:] = configuration.astype(np.int64)
 
     def get_configuration(self):
         return self.configuration.astype(np.int64)
 
-    def degrees2nodes(self, degrees: np.ndarray) -> np.ndarray:
-        return np.vectorize(
+    def degrees2nodes(self, degrees: np.ndarray) -> np.ndarray: # TODO rename to graph2degrees
+        return np.vectorize( # TODO rewrite this slow function
             lambda x: np.unpackbits(np.array([x], dtype="uint8")).sum()
         )(degrees).astype(np.int64)
 
@@ -101,7 +101,7 @@ class Sandpile:
         self.nodes_degrees = self.degrees2nodes(graph)
         self.untoppled[:] = self.configuration
 
-    def undirected_graph(self):
+    def undirected_graph(self): # TODO add undirected for square and hexagonal
         graph = np.full(self.shape, 0b111111)
         graph[0] &= 0b010111
         graph[-1] &= 0b101011

@@ -1,7 +1,6 @@
 import numpy as np
 
 import nisip as ns
-from nisip.core.graph_theory import adjacency_matrix
 
 
 def adjacency_matrix(graph: np.ndarray, tiling: int) -> np.ndarray:
