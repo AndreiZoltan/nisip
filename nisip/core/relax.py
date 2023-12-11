@@ -2,29 +2,28 @@ from copy import deepcopy
 
 import numpy as np
 
-# from numba import jit
-# import taichi as ti
-# ti.init(arch=ti.cpu)
+import taichi as ti
+
+CUDA_VISIBLE_DEVICES = 2
+ti.init(arch=ti.cuda, advanced_optimization=True)
 
 from nisip.sandpiles import Sandpile
 import cnisip as cns
 
 
-# @jit(nopython=True)
-# @ti.func
 def relax_directed(
     configuration: np.ndarray,
     _nodes_degrees: np.ndarray,
     boundary: np.ndarray,
-    directed_graph: np.ndarray,
+    graph: np.ndarray,
 ) -> np.ndarray:
     nodes_degrees = np.where(_nodes_degrees != 0, _nodes_degrees, 6)
-    configuration[boundary != 0] = 0
+    boundary = np.where(boundary, 0, 1)
+    configuration = configuration * boundary
     shift_masks = np.zeros((6, *configuration.shape), dtype=np.bool_)
     for i in range(6):
-        shift_masks[i] = (directed_graph & (1 << i)) != 0
-    while (configuration >= nodes_degrees).any():
-        mask = configuration >= nodes_degrees
+        shift_masks[i] = (graph & (1 << i)) != 0
+    while (mask := configuration >= nodes_degrees).any():
         pile = np.where(mask, configuration, 0)
         configuration[mask] = pile[mask] % nodes_degrees[mask]
         pile = pile // nodes_degrees
@@ -35,7 +34,7 @@ def relax_directed(
         configuration[:-1, :][shifts[3, 1:, :]] += pile[shifts[3]]
         configuration[1:, 1:][shifts[4, :-1, :-1]] += pile[shifts[4]]
         configuration[:-1, :-1][shifts[5, 1:, 1:]] += pile[shifts[5]]
-        configuration[boundary != 0] = 0
+        configuration = configuration * boundary
     configuration[_nodes_degrees == 0] = 0  # TODO: remove this line
     return configuration
 

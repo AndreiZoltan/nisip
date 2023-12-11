@@ -1,10 +1,13 @@
 from copy import deepcopy
 import numpy as np
+import nisip as ns
 
 
 class Sandpile:
-    def __init__(self, shape: tuple, tiling: str="triangular") -> None: # TODO tiling str -> int
+    def __init__(self, shape: tuple, tiling: str = "triangular") -> None:
+        # TODO tiling str -> int
         assert tiling in ("triangular", "square", "hexagonal")
+        # assert tiling in ns.TILINGS
         self.configuration = np.zeros(shape, dtype=np.int64)
         self.untoppled = np.zeros(shape, dtype=np.int64)
         self.boundary = np.zeros(shape, dtype=np.int64)
@@ -81,16 +84,25 @@ class Sandpile:
         Set the configuration of the sandpile.
         """
         assert configuration.shape == self.configuration.shape
-        self.untoppled[:] = configuration.astype(np.int64)  # TODO add boundary condition
+        configuration[self.boundary != 0] = 0
+        self.untoppled[:] = configuration.astype(np.int64)
+        # TODO add boundary condition
         self.configuration[:] = configuration.astype(np.int64)
+
+    def flush(self):
+        self.set_configuration(np.zeros(self.shape, dtype=np.int64))
 
     def get_configuration(self):
         return self.configuration.astype(np.int64)
 
-    def degrees2nodes(self, degrees: np.ndarray) -> np.ndarray: # TODO rename to graph2degrees
-        return np.vectorize( # TODO rewrite this slow function
-            lambda x: np.unpackbits(np.array([x], dtype="uint8")).sum()
-        )(degrees).astype(np.int64)
+    def degrees2nodes(self, degrees: np.ndarray) -> np.ndarray:
+        # TODO rename to graph2degrees
+        degrees = np.unpackbits(degrees.astype(np.uint8), axis=1)
+        degrees = degrees.reshape(degrees.shape[0], -1, 8)
+        return np.sum(degrees, axis=2).astype(np.int64)
+        # return np.vectorize( # TODO rewrite this slow function
+        #     lambda x: np.unpackbits(np.array([x], dtype="uint8")).sum()
+        # )(degrees).astype(np.int64)
 
     def set_graph(self, graph: np.ndarray) -> None:
         """
@@ -101,16 +113,8 @@ class Sandpile:
         self.nodes_degrees = self.degrees2nodes(graph)
         self.untoppled[:] = self.configuration
 
-    def undirected_graph(self): # TODO add undirected for square and hexagonal
-        graph = np.full(self.shape, 0b111111)
-        graph[0] &= 0b010111
-        graph[-1] &= 0b101011
-        graph[:, 0] &= 0b011101
-        graph[:, -1] &= 0b101110
-        return graph
-
     def set_undirected_graph(self) -> None:
-        self.set_graph(self.undirected_graph())
+        self.set_graph(ns.undirected_graph(self.shape, self.tiling))
 
     def set_boundary(self, boundary: np.ndarray) -> None:
         """
@@ -175,7 +179,7 @@ class Sandpile:
 
     @property
     def is_directed(self):
-        return not (self.graph == self.undirected_graph()).all()
+        return not (self.graph == ns.undirected_graph(self.shape, self.tiling)).all()
 
     @property
     def is_regular(self):

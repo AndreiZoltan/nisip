@@ -12,6 +12,8 @@ __all__ = [
     "identity",
     "hexagon_boundary",
     "adjacency_matrix",
+    "undirected_graph",
+    "pyrelax",
 ]
 from .sandpiles import (
     Sandpile,
@@ -21,8 +23,17 @@ from .sandpiles import (
     regular_graph,
     random_graph,
     hexagon_boundary,
+    undirected_graph,
 )
-from .core import relax, save, add, create_from_meta, identity, adjacency_matrix
+from .core import (
+    relax,
+    save,
+    add,
+    create_from_meta,
+    identity,
+    adjacency_matrix,
+    pyrelax,
+)
 from pathlib import Path
 
 NISIP_DIR = Path(__file__).parent

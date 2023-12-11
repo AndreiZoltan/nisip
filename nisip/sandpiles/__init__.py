@@ -5,6 +5,7 @@ from .graphs import (
     charge_graph_with_corridors,
     regular_graph,
     random_graph,
+    undirected_graph,
 )
 from .boundaries import (
     hexagon_boundary,

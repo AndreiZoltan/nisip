@@ -1,1 +1,7 @@
-echo "dunes/*" >> /home/zoltan/sand/nisip/tests/.gitignore
+dunes
+notebooks
+build
+nisip.egg-info
+.vscode
+__pycache__
+*so
