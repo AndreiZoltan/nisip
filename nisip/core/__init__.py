@@ -1,4 +1,4 @@
-from .relax import relax, pyrelax
+from .relax import relax, pyrelax, tairelax, calc_identity
 from .save import save
 from .operations import add
 from .tools import create_from_meta

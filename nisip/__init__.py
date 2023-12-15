@@ -1,3 +1,14 @@
+from pathlib import Path
+
+NISIP_DIR = Path(__file__).parent
+PROJECT_DIR = NISIP_DIR.parent
+TESTS_DIR = PROJECT_DIR / "tests"
+
+SQUARE = 4
+TRIANGULAR = 3
+HEXAGONAL = 6
+TILINGS = [SQUARE, TRIANGULAR, HEXAGONAL]
+
 __all__ = [
     "Sandpile",
     "relax",
@@ -14,6 +25,7 @@ __all__ = [
     "adjacency_matrix",
     "undirected_graph",
     "pyrelax",
+    "tairelax",
 ]
 from .sandpiles import (
     Sandpile,
@@ -33,14 +45,6 @@ from .core import (
     identity,
     adjacency_matrix,
     pyrelax,
+    tairelax,
+    calc_identity,
 )
-from pathlib import Path
-
-NISIP_DIR = Path(__file__).parent
-PROJECT_DIR = NISIP_DIR.parent
-TESTS_DIR = PROJECT_DIR / "tests"
-
-SQUARE = 4
-TRIANGULAR = 3
-HEXAGONAL = 6
-TILINGS = [SQUARE, TRIANGULAR, HEXAGONAL]
