@@ -24,11 +24,19 @@ def has_all_non_boundary_values_less_than_4(arr: ti.i32) -> ti.i32: # type: igno
     return result
 
 @ti.kernel
-def tairelax_directed(configuration: ti.i32, nodes_degrees: ti.i32, boundary: ti.i32, graph: ti.i32):
+def tairelax_directed(configuration: ti.template(), nodes_degrees: ti.template(), boundary: ti.template(), graph: ti.template()) -> ti.i32:  # type: ignore
+    k: ti.i32 = 0
     for i, j in configuration:
-        if boundary[i, j] == 0 and nodes_degrees[i, j] != 0 and configuration[i, j] >= nodes_degrees[i, j]:
+        # if boundary[i, j] == 0 and nodes_degrees[i, j] != 0 and configuration[i, j] >= nodes_degrees[i, j]:
+        node_degree = nodes_degrees[i, j]
+        if configuration[i, j] >= node_degree:
+            if boundary[i, j] == 1:
+                continue
+            if nodes_degrees[i, j] == 0:
+                continue
+            k = 1
             pile = configuration[i, j] // nodes_degrees[i, j]
-            configuration[i, j] %= nodes_degrees[i, j]
+            configuration[i, j] -= pile*nodes_degrees[i, j]
             if graph[i, j] & (1 << 0):
                 configuration[i, j + 1] += pile
             if graph[i, j] & (1 << 1):
@@ -43,15 +51,15 @@ def tairelax_directed(configuration: ti.i32, nodes_degrees: ti.i32, boundary: ti
                 configuration[i - 1, j - 1] += pile
             # Can simplify with something like this:
             # directions = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, -1)]
-            # for k, dx, dy in enumerate(directions):
-            #     if graph[i, j] & (1 << k):
-            #         configuration[i + dx, j + dy] += pile
+            # for l, dxdy in enumerate(directions):
+            #     if graph[i, j] & (1 << l):
+            #         configuration[i + dxdy[0], j + dxdy[1]] += pile
+    return k
 
 
 def tairelax(sandpile: Sandpile, device: int = 0) -> Sandpile:
     sandpile = deepcopy(sandpile)
     os.environ["CUDA_VISIBLE_DEVICES"] = str(device)
-    ti.init(arch=ti.cuda, advanced_optimization=True)
     configuration = ti.field(dtype=ti.int32, shape=sandpile.shape)
     nodes_degrees = ti.field(dtype=ti.int32, shape=sandpile.shape)
     boundary = ti.field(dtype=ti.int32, shape=sandpile.shape)
@@ -60,8 +68,12 @@ def tairelax(sandpile: Sandpile, device: int = 0) -> Sandpile:
     nodes_degrees.from_numpy(sandpile.nodes_degrees.astype(np.int32))
     boundary.from_numpy(sandpile.boundary.astype(np.int32))
     graph.from_numpy(sandpile.graph.astype(np.int32))
-    tairelax_directed(configuration, nodes_degrees, boundary, graph)
-    sandpile.set_configuration(configuration.to_numpy())
+    while tairelax_directed(configuration, nodes_degrees, boundary, graph):
+        pass
+    configuration = configuration.to_numpy()
+    configuration[sandpile.nodes_degrees == 0] = 0
+    configuration[sandpile.boundary == 1] = 0
+    sandpile.set_configuration(configuration)
     return sandpile
 
 

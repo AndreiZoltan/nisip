@@ -109,28 +109,30 @@ def pyrelax_test(relaxed, untoppled, meta, graph, boundary):
     sandpile = pyrelax(sandpile)
     assert np.array_equal(sandpile.get_configuration(), relaxed)
 
-# @pytest.mark.parametrize("relaxed, untoppled, meta, graph, boundary", get_test_list())
-# def tairelax_test(relaxed, untoppled, meta, graph, boundary):
-#     with open(f"{test_path}/{true_data}/{meta}") as f:
-#         meta = json.load(f)
-#     if graph is not None:
-#         graph = np.loadtxt(
-#             f"{test_path}/{true_data}/{graph}",
-#             delimiter=",",
-#             dtype=np.int64,
-#         )
-#     if boundary is not None:
-#         boundary = np.loadtxt(
-#             f"{test_path}/{true_data}/{boundary}", delimiter=",", dtype=np.int64
-#         )
-#     untoppled = np.loadtxt(
-#         f"{test_path}/{true_data}/{untoppled}", delimiter=",", dtype=np.int64
-#     )
-#     sandpile = create_from_meta(
-#         meta, untoppled=untoppled, directed_graph=graph, boundary=boundary
-#     )
-#     relaxed = np.loadtxt(
-#         f"{test_path}/{true_data}/{relaxed}", delimiter=",", dtype=np.int64
-#     )
-#     sandpile = tairelax(sandpile)
-#     assert np.array_equal(sandpile.get_configuration(), relaxed)
+
+@pytest.mark.parametrize("relaxed, untoppled, meta, graph, boundary", get_test_list())
+def tairelax_test(relaxed, untoppled, meta, graph, boundary):
+    with open(f"{test_path}/{true_data}/{meta}") as f:
+        meta = json.load(f)
+    if graph is not None:
+        graph = np.loadtxt(
+            f"{test_path}/{true_data}/{graph}",
+            delimiter=",",
+            dtype=np.int64,
+        )
+    if boundary is not None:
+        boundary = np.loadtxt(
+            f"{test_path}/{true_data}/{boundary}", delimiter=",", dtype=np.int64
+        )
+    untoppled = np.loadtxt(
+        f"{test_path}/{true_data}/{untoppled}", delimiter=",", dtype=np.int64
+    )
+    sandpile = create_from_meta(
+        meta, untoppled=untoppled, directed_graph=graph, boundary=boundary
+    )
+    relaxed = np.loadtxt(
+        f"{test_path}/{true_data}/{relaxed}", delimiter=",", dtype=np.int64
+    )
+    sandpile = tairelax(sandpile)
+    np.set_printoptions(threshold=sys.maxsize)
+    assert np.array_equal(sandpile.get_configuration(), relaxed)
