@@ -12,6 +12,7 @@ class Sandpile:
         self.untoppled = np.zeros(shape, dtype=np.int64)
         self.boundary = np.zeros(shape, dtype=np.int64)
         self.graph = np.zeros(shape, dtype=np.int64)
+        self.toppling = np.zeros(shape, dtype=np.int64)
         self.tiling = tiling
 
         boundary = np.zeros(shape, dtype=np.int64)
@@ -86,7 +87,6 @@ class Sandpile:
         assert configuration.shape == self.configuration.shape
         configuration[self.boundary != 0] = 0
         self.untoppled[:] = configuration.astype(np.int64)
-        # TODO add boundary condition
         self.configuration[:] = configuration.astype(np.int64)
 
     def flush(self):
@@ -125,6 +125,13 @@ class Sandpile:
         boundary[0 :: self.rows - 1] = 1
         boundary[:, 0 :: self.cols - 1] = 1
         self.boundary[:] = boundary
+
+    def set_toppling(self, toppling: np.ndarray) -> None:
+        """
+        Set the toppling of the sandpile.
+        """
+        assert toppling.shape == self.shape
+        self.toppling[:] = toppling
 
     @property
     def max_recurrent(self):

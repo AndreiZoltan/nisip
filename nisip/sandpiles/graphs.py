@@ -75,12 +75,16 @@ def charge_graph_with_corridors(
 ) -> np.ndarray:
     grid = np.indices(shape)
     graph = charge_graph(x, y, shape)
-    for i in range(x % stride, shape[0], stride):
+    for i in range(x % stride, shape[0], stride): # TODO use slicing
         graph[i] |= 0b111111
     for i in range(y % stride, shape[1], stride):
         graph[:, i] |= 0b111111
     for i in range(-shape[0] + ((shape[0] + y - x) % stride), np.sum(shape), stride):
         graph |= np.where(grid[1] == grid[0] + y - x + i, 0b111111, 0)
+    # graph[x % stride:shape[0]:stride] |= 0b111111
+    # graph[:, y % stride:shape[1]:stride] |= 0b111111
+    # graph[::stride] |= np.where(grid[1] == grid[0] + y - x + np.arange(-shape[0] + ((shape[0] + y - x) % stride), np.sum(shape), stride), 0b111111, 0)
+
     return graph
 
 
