@@ -11,7 +11,7 @@ dunes_path = f"{nisip_path}/dunes/"
 
 import numpy as np
 
-from nisip.sandpiles import Sandpile, DirectedSandpile
+from nisip.sandpiles import Sandpile
 from nisip.visualization.hex_heatmap_vector import hex_heatmap_vec
 from nisip.visualization.hex_heatmap_raster import hex_heatmap_raster
 
@@ -59,23 +59,20 @@ def save_data(sandpile: Sandpile, folder: str = "") -> tuple:
     if not folder:
         folder = current
     os.makedirs(f"{dunes_path}/{folder}", exist_ok=True)
-    graph_path = f"{dunes_path}/{folder}/graph_{current}.csv"
-    np.savetxt(graph_path, sandpile.graph, delimiter=",", fmt="%i")
-    if sandpile.is_directed:
-        assert isinstance(sandpile, DirectedSandpile)
-        if not sandpile.is_regular:
-            np.savetxt(
-                f"{dunes_path}/{folder}/directed_graph_{current}.csv",
-                sandpile.directed_graph,
-                delimiter=",",
-                fmt="%i",
-            )
-            np.savetxt(
-                f"{dunes_path}/{folder}/nodes_degrees_{current}.csv",
-                sandpile.nodes_degrees,
-                delimiter=",",
-                fmt="%i",
-            )
+    configuration_path = f"{dunes_path}/{folder}/configuration_{current}.csv"
+    np.savetxt(configuration_path, sandpile.configuration, delimiter=",", fmt="%i")
+    np.savetxt(
+        f"{dunes_path}/{folder}/graph_{current}.csv",
+        sandpile.graph,
+        delimiter=",",
+        fmt="%i",
+    )
+    # np.savetxt(
+    #     f"{dunes_path}/{folder}/nodes_degrees_{current}.csv",
+    #     sandpile.nodes_degrees,
+    #     delimiter=",",
+    #     fmt="%i",
+    # )
     if not sandpile.is_trivial_boundary:
         np.savetxt(
             f"{dunes_path}/{folder}/boundary_{current}.csv",
@@ -92,7 +89,7 @@ def save_data(sandpile: Sandpile, folder: str = "") -> tuple:
     )
     with open(f"{dunes_path}/{folder}/meta_{current}.json", "w") as f:
         json.dump(sandpile.meta, f)
-    return graph_path, folder, current
+    return configuration_path, folder, current
 
 
 def save_image(graph_path: str, folder: str = "", current: str = ""):
@@ -124,7 +121,7 @@ def update_sqlite(
                VALUES (?, ?, ?, ?, ?, ?)""",
         (
             folder,
-            sandpile.grains,
+            sandpile.degree,
             sandpile.rows,
             sandpile.cols,
             sandpile.tiling,
@@ -141,9 +138,9 @@ def save(sandpile: Sandpile, folder: str = "", imsave=True) -> None:
     # if directory nisip_path/dunes does not exist, create it
     assert ncolors(sandpile.tiling) == 6
     con, cur = init_sqlite()
-    graph_path, folder, current = save_data(sandpile, folder)
+    configuration_path, folder, current = save_data(sandpile, folder)
     if imsave:
-        save_image(graph_path, folder, current)
+        save_image(configuration_path, folder, current)
     update_sqlite(sandpile, folder, con, cur)
 
     # print("The image and history were saved in the directory nisip/dunes.")

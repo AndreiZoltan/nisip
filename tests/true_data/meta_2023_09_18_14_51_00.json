@@ -1,1 +1,1 @@
-{"id": 274681997602388559204393367422479328435, "rows": 3, "cols": 4, "tiling": "triangular", "is_directed": false, "grains": 3, "history": [[1.0, 1.0, 8.0]],"is_trivial_boundary":true}
+{"id": 274681997602388559204393367422479328435, "tiling": "triangular", "is_directed": false, "grains": 3, "history": [[1.0, 1.0, 8.0]], "is_trivial_boundary": true, "shape": [3, 4]}

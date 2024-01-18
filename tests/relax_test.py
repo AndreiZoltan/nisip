@@ -15,55 +15,58 @@ sys.path.append(r"{}/{}".format(parent_dir, "nisip"))
 
 test_path = Path(__file__).parent
 from sandpiles import Sandpile  # type: ignore
-from core import relax, create_from_meta  # type: ignore
+from core import relax, pyrelax, tairelax, create_from_meta  # type: ignore
 
 true_data = "true_data/"
+# true_data = "isolate/"
 
 
 def get_test_list():
     files = os.listdir(f"{test_path}/{true_data}/")
+    relaxed = sorted([graph for graph in files if graph.startswith("relaxed_")])
+    untoppled = sorted(
+        [
+            configuration
+            for configuration in files
+            if configuration.startswith("untoppled_")
+        ]
+    )
     graphs = sorted([graph for graph in files if graph.startswith("graph_")])
-    untoppled_graphs = sorted(
-        [graph for graph in files if graph.startswith("untoppled_")]
-    )
-    directed_graphs = sorted(
-        [graph for graph in files if graph.startswith("directed_graph_")]
-    )
     boundary = sorted(
         [boundary for boundary in files if boundary.startswith("boundary_")]
     )
     metas = sorted([meta for meta in files if meta.startswith("meta_")])
-    graphs_id = [graph.replace("graph_", "") for graph in graphs]
-    graphs_id = [graph.replace(".csv", "") for graph in graphs_id]
+    relaxed_id = [graph.replace("relaxed_", "") for graph in relaxed]
+    relaxed_id = [graph.replace(".csv", "") for graph in relaxed_id]
     metas_id = [meta.replace("meta_", "") for meta in metas]
     metas_id = [meta.replace(".json", "") for meta in metas_id]
-    assert set(graphs_id) == set(metas_id)
-    directed_graphs = [
-        f"directed_{graph}" if f"directed_{graph}" in files else "" for graph in graphs
+    assert set(relaxed_id) == set(metas_id)
+    graphs = [
+        graph.replace("relaxed", "graph")
+        if graph.replace("relaxed", "graph") in files
+        else None
+        for graph in relaxed
     ]
     boundary = [
-        f"boundary_{'_'.join(graph.split('_')[1:])}"
-        if f"boundary_{'_'.join(graph.split('_')[1:])}" in files
-        else ""
-        for graph in graphs
+        boundary.replace("relaxed", "boundary")
+        if boundary.replace("relaxed", "boundary") in files
+        else None
+        for boundary in relaxed
     ]
-    return list(zip(graphs, untoppled_graphs, metas, directed_graphs, boundary))
+    return list(zip(relaxed, untoppled, metas, graphs, boundary))
 
 
-@pytest.mark.parametrize(
-    "graph, untoppled, meta, directed_graph, boundary", get_test_list()
-)
-def relax_test(graph, untoppled, meta, directed_graph, boundary):
+@pytest.mark.parametrize("relaxed, untoppled, meta, graph, boundary", get_test_list())
+def relax_test(relaxed, untoppled, meta, graph, boundary):
     with open(f"{test_path}/{true_data}/{meta}") as f:
         meta = json.load(f)
-    if meta["is_directed"]:
-        if not meta["is_regular"]:
-            directed_graph = np.loadtxt(
-                f"{test_path}/{true_data}/{directed_graph}",
-                delimiter=",",
-                dtype=np.int64,
-            )
-    if not meta["is_trivial_boundary"]:
+    if graph is not None:
+        graph = np.loadtxt(
+            f"{test_path}/{true_data}/{graph}",
+            delimiter=",",
+            dtype=np.int64,
+        )
+    if boundary is not None:
         boundary = np.loadtxt(
             f"{test_path}/{true_data}/{boundary}", delimiter=",", dtype=np.int64
         )
@@ -71,32 +74,65 @@ def relax_test(graph, untoppled, meta, directed_graph, boundary):
         f"{test_path}/{true_data}/{untoppled}", delimiter=",", dtype=np.int64
     )
     sandpile = create_from_meta(
-        meta, untoppled=untoppled, directed_graph=directed_graph, boundary=boundary
+        meta, untoppled=untoppled, directed_graph=graph, boundary=boundary
     )
-    graph = np.loadtxt(
-        f"{test_path}/{true_data}/{graph}", delimiter=",", dtype=np.int64
+    relaxed = np.loadtxt(
+        f"{test_path}/{true_data}/{relaxed}", delimiter=",", dtype=np.int64
     )
-    assert np.array_equal(sandpile.graph, graph)
-
-
-@pytest.mark.parametrize(
-    "rows, cols, tiling, x, y, z",
-    [
-        [3, 3, "square", 1, 1, 10],
-    ],
-)
-def drop_sand_boundary_test(rows, cols, tiling, x, y, z):
-    if tiling == "square":
-        max_grain = 3
-    elif tiling == "triangular":
-        max_grain = 5
-    else:
-        max_grain = 2
-    sandpile = Sandpile(rows, cols, tiling)
-    sandpile.add(x, y, z)
     sandpile = relax(sandpile)
-    assert np.max(sandpile.graph) <= max_grain
-    assert np.max(sandpile.graph[0]) == 0
-    assert np.max(sandpile.graph[-1]) == 0
-    assert np.max(sandpile.graph[:, 0]) == 0
-    assert np.max(sandpile.graph[:, -1]) == 0
+    assert np.array_equal(sandpile.get_configuration(), relaxed)
+
+
+@pytest.mark.parametrize("relaxed, untoppled, meta, graph, boundary", get_test_list())
+def pyrelax_test(relaxed, untoppled, meta, graph, boundary):
+    with open(f"{test_path}/{true_data}/{meta}") as f:
+        meta = json.load(f)
+    if graph is not None:
+        graph = np.loadtxt(
+            f"{test_path}/{true_data}/{graph}",
+            delimiter=",",
+            dtype=np.int64,
+        )
+    if boundary is not None:
+        boundary = np.loadtxt(
+            f"{test_path}/{true_data}/{boundary}", delimiter=",", dtype=np.int64
+        )
+    untoppled = np.loadtxt(
+        f"{test_path}/{true_data}/{untoppled}", delimiter=",", dtype=np.int64
+    )
+    sandpile = create_from_meta(
+        meta, untoppled=untoppled, directed_graph=graph, boundary=boundary
+    )
+    relaxed = np.loadtxt(
+        f"{test_path}/{true_data}/{relaxed}", delimiter=",", dtype=np.int64
+    )
+    sandpile = pyrelax(sandpile)
+    assert np.array_equal(sandpile.get_configuration(), relaxed)
+
+
+@pytest.mark.parametrize("relaxed, untoppled, meta, graph, boundary", get_test_list())
+def tairelax_test(relaxed, untoppled, meta, graph, boundary):
+    with open(f"{test_path}/{true_data}/{meta}") as f:
+        meta = json.load(f)
+    if graph is not None:
+        graph = np.loadtxt(
+            f"{test_path}/{true_data}/{graph}",
+            delimiter=",",
+            dtype=np.int64,
+        )
+    if boundary is not None:
+        boundary = np.loadtxt(
+            f"{test_path}/{true_data}/{boundary}", delimiter=",", dtype=np.int64
+        )
+    untoppled = np.loadtxt(
+        f"{test_path}/{true_data}/{untoppled}", delimiter=",", dtype=np.int64
+    )
+    sandpile = create_from_meta(
+        meta, untoppled=untoppled, directed_graph=graph, boundary=boundary
+    )
+    relaxed = np.loadtxt(
+        f"{test_path}/{true_data}/{relaxed}", delimiter=",", dtype=np.int64
+    )
+    sandpile = tairelax(sandpile)
+    np.set_printoptions(threshold=sys.maxsize)
+    assert np.array_equal(sandpile.get_configuration(), relaxed)
