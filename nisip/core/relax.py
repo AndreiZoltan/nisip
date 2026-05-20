@@ -6,7 +6,7 @@ import taichi as ti
 
 import nisip as ns
 
-device = 3
+device = 0
 os.environ["CUDA_VISIBLE_DEVICES"] = str(device)
 ti.init(arch=ti.cuda, advanced_optimization=True)
 
@@ -230,14 +230,7 @@ def relax(sandpile: Sandpile) -> Sandpile:
     sandpile = deepcopy(sandpile)
     if sandpile.tiling == "square":
         if sandpile.is_trivial_boundary:
-            sandpile.set_configuration(
-                cns.relax_triangular_directed_irregular_non_trivial_boundary(
-                    sandpile.configuration,
-                    sandpile.graph,
-                    sandpile.nodes_degrees,
-                    sandpile.boundary,
-                )
-            )
+            sandpile.set_configuration(cns.relax_square(sandpile.configuration))
     elif sandpile.tiling == "triangular":
         if sandpile.is_directed:
             if sandpile.is_trivial_boundary:
