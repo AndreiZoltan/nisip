@@ -5,7 +5,7 @@
 ## Features
 
 - **Multiple Tilings:** Support for square, triangular, and hexagonal grid topologies.
-- **Fast C Backend:** Sandpile relaxation (toppling) is implemented as a C extension for maximum performance.
+- **Fast C & GPU Backends:** Sandpile relaxation (toppling) is implemented as a C extension for maximum performance, alongside support for a GPU backend for hardware acceleration.
 - **Custom Boundaries & Graphs:** Support for directed/undirected graphs and custom boundary conditions.
 - **Group Operations:** Built-in operations corresponding to the Abelian Sandpile Group (addition, multiplication).
 - **Visualization:** Tools for plotting and visualizing the configurations in regular and hexagonal grids, both as rasters and vectors.
@@ -40,11 +40,19 @@ pile.add(10, 10, 100)
 
 # The sandpile can be relaxed using the core tools (internally calls the C extension bindings)
 from nisip.core.relax import relax
-relax(pile)
+pile_relaxed_c = relax(pile)
 
-# Get the current configuration
-config = pile.get_configuration()
-print(config)
+# Get the current configuration for the C-relaxed pile
+config_c = pile_relaxed_c.get_configuration()
+print("C Backend Configuration:\n", config_c)
+
+# Alternatively, the sandpile can be relaxed using the Taichi GPU backend
+from nisip.core.relax import tairelax
+pile_relaxed_gpu = tairelax(pile)
+
+# Get the current configuration for the GPU-relaxed pile
+config_gpu = pile_relaxed_gpu.get_configuration()
+print("GPU Backend Configuration:\n", config_gpu)
 ```
 
 ## Testing
